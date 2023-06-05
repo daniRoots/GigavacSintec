@@ -1,0 +1,410 @@
+﻿<Window x:Class="GigavacFuseApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GigavacFuseApp"
+        mc:Ignorable="d"
+        Title="Sensata | Gigavac" Height="550" Width="1034" Icon="/Assets/LogoSINTEC S.png" Closing="ClosingWindow">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Menu Background="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}">
+                <MenuItem Header="_Station" FontSize="13" Margin="5">
+                    <MenuItem Name="sbmSettings" Header="_Settings"/>
+                    <MenuItem Name="sbmConnect" Header="_Connect" Click="MnuConnectClick"/>
+                    <MenuItem Name="sbmDisconnect" Header="_Disconnect" Click="MnuDisconnectClick"/>
+                    <Separator/>
+                    <MenuItem Header="Exit" Click="MnuExitClick"/>
+                </MenuItem>
+                <MenuItem Header="_Help" FontSize="13" Margin="5"></MenuItem>
+            </Menu>
+        </Grid>
+        <Grid Grid.Row="1">
+            <TabControl TabStripPlacement="Left">
+                <TabItem Header="Insert Shield y M8" Height="40" Width="150" BorderBrush="{x:Null}" >
+                    <Grid Background="White">
+                        <TabControl>
+                            <TabItem Header="Monitor">
+                                <Grid Background="#FFE5E5E5"/>
+                            </TabItem>
+                            <TabItem Header="Secuencia">
+                                <Grid Background="#FFE5E5E5"/>
+                            </TabItem>
+                            <TabItem Header="Alarmas">
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="50"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <GroupBox Background="White" BorderThickness="2" BorderBrush="#FF124981">
+                                            <GroupBox.Header>
+                                                <Label Content="Alarmas" Background="#FF124981" Foreground="White"/>
+                                            </GroupBox.Header>
+                                        </GroupBox>
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto" >
+                                            <StackPanel Name="stpShldM8Alm" Margin="5,5,5,5" ></StackPanel>
+                                        </ScrollViewer>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <Button Name="btnRstShldM8" Content="Reset"
+                                                FontSize="15" Margin="25,0,10,0"
+                                                HorizontalAlignment="Right"
+                                                Width="100" Height="40"
+                                                BorderThickness="2" Background="#FFDDDDDD"/>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="I/O Monitor">
+                                <Grid Background="#FFE5E5E5"/>
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Plunger" Height="40" Width="150" BorderBrush="{x:Null}" >
+                    <Grid Background="White">
+                        <TabControl>
+                            <TabItem Header="Monitor">
+                                <Grid Background="#FFE5E5E5"/>
+                            </TabItem>
+                            <TabItem Header="Secuencia">
+                                <Grid Background="#FFE5E5E5"/>
+                            </TabItem>
+                            <TabItem Header="Alarmas">
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="50"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <GroupBox Background="White" BorderThickness="2" BorderBrush="#FF124981">
+                                            <GroupBox.Header>
+                                                <Label Content="Alarmas" Background="#FF124981" Foreground="White"/>
+                                            </GroupBox.Header>
+                                        </GroupBox>
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto" >
+                                            <StackPanel Name="stpPlngrAlm" Margin="5,5,5,5" ></StackPanel>
+                                        </ScrollViewer>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <Button Name="btnRstPlngr" Content="Reset"
+                                                FontSize="15" Margin="25,0,10,0"
+                                                HorizontalAlignment="Right"
+                                                Width="100" Height="40"
+                                                BorderThickness="2" Background="#FFDDDDDD"/>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Latch" Height="40" Width="150" BorderBrush="{x:Null}" >
+                    <Grid Background="White">
+                        <TabControl>
+                            <TabItem Header="Monitor">
+                                <Grid Background="#FFE5E5E5"/>
+                            </TabItem>
+                            <TabItem Header="Secuencia">
+                                <Grid Background="#FFE5E5E5"/>
+                            </TabItem>
+                            <TabItem Header="Alarmas">
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="50"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <GroupBox Background="White" BorderThickness="2" BorderBrush="#FF124981">
+                                            <GroupBox.Header>
+                                                <Label Content="Alarmas" Background="#FF124981" Foreground="White"/>
+                                            </GroupBox.Header>
+                                        </GroupBox>
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto" >
+                                            <StackPanel Name="stpLatchAlm" Margin="5,5,5,5" ></StackPanel>
+                                        </ScrollViewer>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <Button Name="btnRstAlm" Content="Reset"
+                                                FontSize="15" Margin="25,0,10,0"
+                                                HorizontalAlignment="Right"
+                                                Width="100" Height="40"
+                                                BorderThickness="2" Background="#FFDDDDDD"/>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+                    </Grid> 
+                </TabItem>
+                <TabItem Header="General Monitor" Height="40" Width="150" BorderBrush="{x:Null}" >
+                    <Grid Background="White">
+                        <TabControl>
+                            <TabItem Header="Alarmas">
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="50"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <GroupBox Background="White" BorderThickness="2" BorderBrush="#FF124981">
+                                            <GroupBox.Header>
+                                                <Label Content="Alarmas generales" Background="#FF124981" Foreground="White"/>
+                                            </GroupBox.Header>
+                                        </GroupBox>
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto" >
+                                            <StackPanel Name="stpGralAlarm" Margin="5,5,5,5" ></StackPanel>
+                                        </ScrollViewer>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <Button Name="btnResetGral" Content="Reset"
+                                                FontSize="15" Margin="25,0,10,0"
+                                                HorizontalAlignment="Right"
+                                                Width="100" Height="40"
+                                                BorderThickness="2" Background="#FFDDDDDD"/>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Historial">
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="50"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <GroupBox Background="White" BorderThickness="2" BorderBrush="#FF124981">
+                                            <GroupBox.Header>
+                                                <Label Content="Historial" Background="#FF124981" Foreground="White"/>
+                                            </GroupBox.Header>
+                                        </GroupBox>
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto" >
+                                            <StackPanel Name="stpHistory" Margin="5,5,5,5" ></StackPanel>
+                                        </ScrollViewer>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <Button Name="btnClearHistory" Content="Limpiar"
+                                                FontSize="15" Margin="25,0,10,0"
+                                                HorizontalAlignment="Right"
+                                                Width="100" Height="40"
+                                                BorderThickness="2" Background="#FFDDDDDD"/>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Network">
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="150"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Width="250" Height="Auto" Margin="10,0,0,44" HorizontalAlignment="Left">
+                                            <Label Content="OPC UA monitor" FontSize="15" 
+                                                   FontWeight="Bold" Foreground="#FF124981"/>
+                                            <Label Content="OPC UA Uri:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="78"/>
+                                            <TextBlock x:Name="dspUri" Background="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" 
+                                                       Width="200" HorizontalAlignment="Left" TextAlignment="Center"/>
+                                            <Grid Margin="0,5,0,0">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button x:Name="btnConnect" Width="65" Height="25" 
+                                                    Content="Connect" Margin="10,5,0,0" HorizontalAlignment="Left" Click="BtnConnectClick"/>
+                                                    <Rectangle Name="lmpOpcUaConnect" HorizontalAlignment="Left" Height="25"
+                                                   Margin="0,5,0,0" VerticalAlignment="Top" Width="15" 
+                                                   StrokeThickness="1">
+                                                        <Rectangle.Fill>
+                                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                <GradientStop Color="Gray" Offset="1"/>
+                                                                <GradientStop Color="White" Offset="0.481"/>
+                                                                <GradientStop Color="Gray" Offset="0"/>
+                                                            </LinearGradientBrush>
+                                                        </Rectangle.Fill>
+                                                    </Rectangle>
+                                                    <Button x:Name="btnDisconnect" Width="65" Height="25" 
+                                                    Content="Disconnect" Margin="15,5,0,0" HorizontalAlignment="Right" Click="BtnDisconnectClick"/>
+                                                    <Rectangle Name="lmpOpcUaDisconnect" HorizontalAlignment="Left" Height="25"
+                                                   Margin="0,5,0,0" VerticalAlignment="Top" Width="15" 
+                                                   StrokeThickness="1">
+                                                        <Rectangle.Fill>
+                                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                <GradientStop Color="Gray" Offset="1"/>
+                                                                <GradientStop Color="White" Offset="0.481"/>
+                                                                <GradientStop Color="Gray" Offset="0"/>
+                                                            </LinearGradientBrush>
+                                                        </Rectangle.Fill>
+                                                    </Rectangle>
+                                                </StackPanel>
+
+                                            </Grid>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <Label Content="EtherCAT monitor" FontSize="15" 
+                                                   FontWeight="Bold" Foreground="#FF124981"/>
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                <Label Content="Error code:"/>
+                                                <TextBlock x:Name="dspECATErr" Background="White" Width="100"/>
+                                                <Button x:Name="btnRstECat" Content="Reset" Width="80" Margin="10,0,0,0"/>
+                                            </StackPanel>
+                                            <StackPanel >
+                                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                    <Label Content="Node1" />
+                                                    <Rectangle Name="lmpNode1" HorizontalAlignment="Left" Height="25"
+                                                   Margin="15,0,0,0" VerticalAlignment="Top" Width="55" 
+                                                   StrokeThickness="1">
+                                                        <Rectangle.Fill>
+                                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                <GradientStop Color="DarkRed" Offset="1"/>
+                                                                <GradientStop Color="Red" Offset="0.481"/>
+                                                                <GradientStop Color="DarkRed" Offset="0"/>
+                                                            </LinearGradientBrush>
+                                                        </Rectangle.Fill>
+                                                    </Rectangle>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                    <Label Content="Node2" />
+                                                    <Rectangle Name="lmpNode2" HorizontalAlignment="Left" Height="25"
+                                                   Margin="15,0,0,0" VerticalAlignment="Top" Width="55" 
+                                                   StrokeThickness="1">
+                                                        <Rectangle.Fill>
+                                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                <GradientStop Color="DarkRed" Offset="1"/>
+                                                                <GradientStop Color="Red" Offset="0.481"/>
+                                                                <GradientStop Color="DarkRed" Offset="0"/>
+                                                            </LinearGradientBrush>
+                                                        </Rectangle.Fill>
+                                                    </Rectangle>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                    <Label Content="Node3" />
+                                                    <Rectangle Name="lmpNode3" HorizontalAlignment="Left" Height="25"
+                                                   Margin="15,0,0,0" VerticalAlignment="Top" Width="55" 
+                                                   StrokeThickness="1">
+                                                        <Rectangle.Fill>
+                                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                <GradientStop Color="DarkRed" Offset="1"/>
+                                                                <GradientStop Color="Red" Offset="0.481"/>
+                                                                <GradientStop Color="DarkRed" Offset="0"/>
+                                                            </LinearGradientBrush>
+                                                        </Rectangle.Fill>
+                                                    </Rectangle>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                    <Label Content="Node4" />
+                                                    <Rectangle Name="lmpNode4" HorizontalAlignment="Left" Height="25"
+                                                   Margin="15,0,0,0" VerticalAlignment="Top" Width="55" 
+                                                   StrokeThickness="1">
+                                                        <Rectangle.Fill>
+                                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                <GradientStop Color="DarkRed" Offset="1"/>
+                                                                <GradientStop Color="Red" Offset="0.481"/>
+                                                                <GradientStop Color="DarkRed" Offset="0"/>
+                                                            </LinearGradientBrush>
+                                                        </Rectangle.Fill>
+                                                    </Rectangle>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                    <Label Content="Node5" />
+                                                    <Rectangle Name="lmpNode5" HorizontalAlignment="Left" Height="25"
+                                                   Margin="15,0,0,0" VerticalAlignment="Top" Width="55" 
+                                                   StrokeThickness="1">
+                                                        <Rectangle.Fill>
+                                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                <GradientStop Color="DarkRed" Offset="1"/>
+                                                                <GradientStop Color="Red" Offset="0.481"/>
+                                                                <GradientStop Color="DarkRed" Offset="0"/>
+                                                            </LinearGradientBrush>
+                                                        </Rectangle.Fill>
+                                                    </Rectangle>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <Label Content="Ethernet/IP monitor" FontSize="15" 
+                                                   FontWeight="Bold" Foreground="#FF124981"/>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Label Content="Port2:"/>
+                                                <TextBox Name="dspPortSts" Background="White" Text="Offline" VerticalAlignment="Center" Height="27" TextAlignment="Center" VerticalContentAlignment="Center" Width="74"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Label Content="Error code:" Margin="0,10"/>
+                                                <TextBox Name="dspEIPCode" Width="100" Margin="0,10"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <GroupBox Background="White" BorderThickness="2" BorderBrush="#FF124981">
+                                            <GroupBox.Header>
+                                                <Label Content="OPC UA Log" Background="#FF124981" Foreground="White"/>
+                                            </GroupBox.Header>
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto" >
+                                                <StackPanel x:Name="stpOpcUaLog" Margin="5,5,5,5" ></StackPanel>
+                                            </ScrollViewer>
+                                        </GroupBox>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+
+                    </Grid>
+                </TabItem>
+            </TabControl>
+
+        </Grid>
+        <Grid Grid.Row="2">
+            <Button Name="btnReset" Content="Reset" 
+                    FontSize="15" Margin="25,0,0,5" 
+                    HorizontalAlignment="Left" 
+                    Width="100" Height="40" VerticalAlignment="Bottom" 
+                    BorderThickness="2" BorderBrush="#FF19C0D4" Background="#FFDDDDDD"/>
+            <Rectangle HorizontalAlignment="Left" Height="40" 
+                       Margin="242,0,0,0" 
+                       VerticalAlignment="Center" Width="100"
+                       StrokeThickness="2">
+                <Rectangle.Fill>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Gray" Offset="1"/>
+                        <GradientStop Color="White" Offset="0.481"/>
+                        <GradientStop Color="Gray" Offset="0"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Grid>
+        <Grid Grid.Row="3">
+            <StatusBar Background="#FF124981">
+                <StatusBar.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="200"/>
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                    </ItemsPanelTemplate>
+                </StatusBar.ItemsPanel>
+                <StatusBarItem Grid.Column="0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Name="dspOpcStatus" Text="Status" 
+                               Foreground="White" FontSize="15" Width="Auto"/>
+                        <Ellipse Name="lmpOpcStatus" 
+                                 Height="10" Width="10" 
+                                 Fill="Gray"
+                                 Margin="3"></Ellipse>
+                    </StackPanel>
+                </StatusBarItem>
+                <StatusBarItem Grid.Column="2">
+                    <TextBlock Name="dspDate" Text="date" Foreground="White" 
+                               FontSize="15" Width="200" TextAlignment="Center"/>
+                </StatusBarItem>
+            </StatusBar>
+        </Grid>
+    </Grid>
+</Window>
