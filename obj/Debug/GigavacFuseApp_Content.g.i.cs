@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("assets/logosintec.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("captura%20de%20pantalla%202023-07-05%20a%20la(s)%2020.04.09.png")]
 
 

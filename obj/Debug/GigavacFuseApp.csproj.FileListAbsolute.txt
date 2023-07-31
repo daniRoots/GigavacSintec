@@ -127,3 +127,5 @@ C:\Users\danie\OneDrive\Sintec Docs\Develops\SNT01_Gigavac\Software\AppDevelop\G
 C:\Users\danie\OneDrive\Sintec Docs\Develops\SNT01_Gigavac\Software\AppDevelop\GigavacFuseApp\obj\Debug\GigavacFuseApp.csproj.CopyComplete
 C:\Users\danie\OneDrive\Sintec Docs\Develops\SNT01_Gigavac\Software\AppDevelop\GigavacFuseApp\obj\Debug\GigavacFuseApp.exe
 C:\Users\danie\OneDrive\Sintec Docs\Develops\SNT01_Gigavac\Software\AppDevelop\GigavacFuseApp\obj\Debug\GigavacFuseApp.pdb
+C:\Users\danie\OneDrive\Sintec Docs\Develops\SNT01_Gigavac\Software\AppDevelop\GigavacFuseApp\bin\Debug\Microsoft.Bcl.HashCode.dll
+C:\Users\danie\OneDrive\Sintec Docs\Develops\SNT01_Gigavac\Software\AppDevelop\GigavacFuseApp\bin\Debug\Microsoft.Bcl.HashCode.xml
