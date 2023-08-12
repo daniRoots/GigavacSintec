@@ -520,6 +520,9 @@ namespace GigavacFuseApp
                         new ReadValueId() {NodeId = "ns=4;s=lmpTorque1Ready",       AttributeId = Attributes.Value},/*154*/
                         new ReadValueId() {NodeId = "ns=4;s=lmpTorque2Ready",       AttributeId = Attributes.Value},/*155*/
                         new ReadValueId() {NodeId = "ns=4;s=lmpSpringHome",         AttributeId = Attributes.Value},/*156*/
+                        new ReadValueId() {NodeId = "ns=4;s=lmpLatchHome",          AttributeId = Attributes.Value},/*157*/
+                        new ReadValueId() {NodeId = "ns=4;s=lmpBoltHome",           AttributeId = Attributes.Value},/*158*/
+                        new ReadValueId() {NodeId = "ns=4;s=lmpPosCorrectHome",     AttributeId = Attributes.Value},/*159*/
                     };
                 while (!token.IsCancellationRequested)
                 {
@@ -2052,6 +2055,39 @@ namespace GigavacFuseApp
                     {
                         lmpSpringHome1.Dispatcher.Invoke(() => { lmpSpringHome1.Fill = brushGray; });
                     }
+
+                    //lmpLatchHome
+                    if ((bool)resultsValues[157].Value == true)
+                    {
+                        lmpLatchHome1.Dispatcher.Invoke(() => { lmpLatchHome1.Fill = brushGreen; });
+                    }
+                    else
+                    {
+                        lmpLatchHome1.Dispatcher.Invoke(() => { lmpLatchHome1.Fill = brushGray; });
+                    }
+
+                    //lmpBoltHome
+                    if ((bool)resultsValues[158].Value == true)
+                    {
+                        lmpBoltHome.Dispatcher.Invoke(() => { lmpBoltHome.Fill = brushGreen; });
+                        lmpBoltHome1.Dispatcher.Invoke(() => { lmpBoltHome1.Fill = brushGreen; });
+                    }
+                    else
+                    {
+                        lmpBoltHome.Dispatcher.Invoke(() => { lmpBoltHome.Fill = brushGray; });
+                        lmpBoltHome1.Dispatcher.Invoke(() => { lmpBoltHome1.Fill = brushGray; });
+                    }
+
+                    //lmpPosCorrectHome
+                    if ((bool)resultsValues[159].Value == true)
+                    {
+                        lmpPressHome1.Dispatcher.Invoke(() => { lmpPressHome1.Fill = brushGreen; });
+                    }
+                    else
+                    {
+                        lmpPressHome1.Dispatcher.Invoke(() => { lmpPressHome1.Fill = brushGray; });
+                    }
+
 
                     #endregion
 
