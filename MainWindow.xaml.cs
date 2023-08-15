@@ -58,6 +58,8 @@ namespace GigavacFuseApp
             brushGray.GradientStops.Add(whiteGradient);
             brushGray.GradientStops.Add(grayBottomGradient);
 
+            //resultsValues = new DataValueCollection();
+
             cancellGetDateTask = new CancellationTokenSource();
             _ctGetDateTask = cancellGetDateTask.Token;
             getTimeTask = Task.Run(new Action(() => { GetDate(_ctGetDateTask); }));
@@ -73,6 +75,8 @@ namespace GigavacFuseApp
         #region Opc UA fields
         private OpcUaClient opcUaClient;
         private ReadValueIdCollection nodesToRead;
+        private DataValueCollection resultsValues;
+        private DataValueCollection tempResultValues;
         private bool autoAccept = false;
         private static bool sessionConnected = false;
         private bool disconnectCmd;
@@ -98,6 +102,10 @@ namespace GigavacFuseApp
         private CancellationTokenSource cancellGetStatusTask;
         private CancellationToken _ctGetStatusTask;
 
+        private Task opcUaGetVarsTask;
+        private CancellationTokenSource cancellGetVarsTask;
+        private CancellationToken _ctGetVarsTask;
+
         private Task OpcUaMonitor;
         private Task TasksMonitor;
         #endregion
@@ -122,8 +130,11 @@ namespace GigavacFuseApp
         {
             while (!_ct.IsCancellationRequested)
             {
-                DateTime dateTime = DateTime.Now;
-                dspDate.Dispatcher.Invoke(() => { dspDate.Text = dateTime.ToString(); });
+                try
+                {
+                    DateTime dateTime = DateTime.Now;
+                    dspDate.Dispatcher.Invoke(() => { dspDate.Text = dateTime.ToString(); });
+                } catch (Exception) { }
             }
             return;
         }
@@ -246,8 +257,6 @@ namespace GigavacFuseApp
                         });
                         tokenSource.Dispose();
                     }
-
-                    Thread.Sleep(100);
                     opcUaClient.Disconnect();
                     sessionConnected = false;
                     stpOpcUaLog.Dispatcher.Invoke(() => {
@@ -261,7 +270,1577 @@ namespace GigavacFuseApp
 
             }
         }
+        private void VarOpcUaMonitor(CancellationToken token)
+        {
+            try
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    if (sessionConnected && resultsValues != null && resultsValues.Count > 0)
+                    {
+                        dspDeviceID.Dispatcher.Invoke(() => { dspDeviceID.Text = (string)resultsValues[0].Value; });
+                        dspLotID.Dispatcher.Invoke(() => { dspLotID.Text = (string)resultsValues[1].Value; });
+                        dspQty.Dispatcher.Invoke(() => { dspQty.Text = (string)resultsValues[2].Value; });
+                        dspSelectedDvcID.Dispatcher.Invoke(() => { dspDeviceID.Text = (string)resultsValues[3].Value; });
+                        dspSelectedLotID.Dispatcher.Invoke(() => { dspLotID.Text = (string)resultsValues[4].Value; });
+                        dspSelectedQty.Dispatcher.Invoke(() => { dspQty.Text = (string)resultsValues[5].Value; });
 
+                        #region lamps
+
+                        //lmpTrayPos1
+                        if ((bool)resultsValues[6].Value == true)
+                        {
+                            lmpTrayPos1.Dispatcher.Invoke(() => { lmpTrayPos1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpTrayPos1.Dispatcher.Invoke(() => { lmpTrayPos1.Fill = brushGray; });
+                        }
+
+                        //lmpTrayPos2
+                        if ((bool)resultsValues[7].Value == true)
+                        {
+                            lmpTrayPos2.Dispatcher.Invoke(() => { lmpTrayPos2.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpTrayPos2.Dispatcher.Invoke(() => { lmpTrayPos2.Fill = brushGray; });
+                        }
+
+                        //lmpTrayPos3
+                        if ((bool)resultsValues[8].Value == true)
+                        {
+                            lmpTrayPos3.Dispatcher.Invoke(() => { lmpTrayPos3.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpTrayPos3.Dispatcher.Invoke(() => { lmpTrayPos3.Fill = brushGray; });
+                        }
+
+                        //lmpStoper1In
+                        if ((bool)resultsValues[9].Value == true)
+                        {
+                            lmpStopr1Opn.Dispatcher.Invoke(() => { lmpStopr1Opn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpStopr1Opn.Dispatcher.Invoke(() => { lmpStopr1Opn.Fill = brushGray; });
+                        }
+
+                        //lmpStoper2In
+                        if ((bool)resultsValues[10].Value == true)
+                        {
+                            lmpStopr2Opn.Dispatcher.Invoke(() => { lmpStopr2Opn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpStopr2Opn.Dispatcher.Invoke(() => { lmpStopr2Opn.Fill = brushGray; });
+                        }
+
+                        //lmpHoldAOpn
+                        if ((bool)resultsValues[11].Value == true)
+                        {
+                            lmpHoldAOpn.Dispatcher.Invoke(() => { lmpHoldAOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpHoldAOpn.Dispatcher.Invoke(() => { lmpHoldAOpn.Fill = brushGray; });
+                        }
+
+                        //lmpHoldACls
+                        if ((bool)resultsValues[12].Value == true)
+                        {
+                            lmpHoldACls.Dispatcher.Invoke(() => { lmpHoldACls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpHoldACls.Dispatcher.Invoke(() => { lmpHoldACls.Fill = brushGray; });
+                        }
+
+                        //lmpHoldBOpn
+                        if ((bool)resultsValues[13].Value == true)
+                        {
+                            lmpHoldBOpn.Dispatcher.Invoke(() => { lmpHoldBOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpHoldBOpn.Dispatcher.Invoke(() => { lmpHoldBOpn.Fill = brushGray; });
+                        }
+
+                        //lmpHoldBCls
+                        if ((bool)resultsValues[14].Value == true)
+                        {
+                            lmpHoldBCls.Dispatcher.Invoke(() => { lmpHoldBCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpHoldBCls.Dispatcher.Invoke(() => { lmpHoldBCls.Fill = brushGray; });
+                        }
+
+                        //lmpHoldCOpn
+                        if ((bool)resultsValues[15].Value == true)
+                        {
+                            lmpHoldCOpn.Dispatcher.Invoke(() => { lmpHoldCOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpHoldCOpn.Dispatcher.Invoke(() => { lmpHoldCOpn.Fill = brushGray; });
+                        }
+
+                        //lmpHoldCCls
+                        if ((bool)resultsValues[16].Value == true)
+                        {
+                            lmpHoldCCls.Dispatcher.Invoke(() => { lmpHoldCCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpHoldCCls.Dispatcher.Invoke(() => { lmpHoldCCls.Fill = brushGray; });
+                        }
+
+                        //lmpEjectOpn
+                        if ((bool)resultsValues[17].Value == true)
+                        {
+                            lmpEjectOpn.Dispatcher.Invoke(() => { lmpEjectOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpEjectOpn.Dispatcher.Invoke(() => { lmpEjectOpn.Fill = brushGray; });
+                        }
+
+                        //lmpEjectCls
+                        if ((bool)resultsValues[18].Value == true)
+                        {
+                            lmpEjectCls.Dispatcher.Invoke(() => { lmpEjectCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpEjectCls.Dispatcher.Invoke(() => { lmpEjectCls.Fill = brushGray; });
+                        }
+
+                        //lmpCheckSide
+                        if ((bool)resultsValues[19].Value == true)
+                        {
+                            lmpCheckSide.Dispatcher.Invoke(() => { lmpCheckSide.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpCheckSide.Dispatcher.Invoke(() => { lmpCheckSide.Fill = brushGray; });
+                        }
+
+                        //lmpRbt1GrpCls
+                        if ((bool)resultsValues[20].Value == true)
+                        {
+                            lmpRbt1GrpCls.Dispatcher.Invoke(() => { lmpRbt1GrpCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpRbt1GrpCls.Dispatcher.Invoke(() => { lmpRbt1GrpCls.Fill = brushGray; });
+                        }
+
+                        //lmpRbt1GrpOpn
+                        if ((bool)resultsValues[21].Value == true)
+                        {
+                            lmpRbt1GrpOpn.Dispatcher.Invoke(() => { lmpRbt1GrpOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpRbt1GrpOpn.Dispatcher.Invoke(() => { lmpRbt1GrpOpn.Fill = brushGray; });
+                        }
+
+                        //lmpRbtToolA
+                        if ((bool)resultsValues[22].Value == true)
+                        {
+                            lmpRbtToolA.Dispatcher.Invoke(() => { lmpRbtToolA.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpRbtToolA.Dispatcher.Invoke(() => { lmpRbtToolA.Fill = brushGray; });
+                        }
+
+                        //lmpRbtToolB
+                        if ((bool)resultsValues[23].Value == true)
+                        {
+                            lmpRbtToolB.Dispatcher.Invoke(() => { lmpRbtToolB.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpRbtToolB.Dispatcher.Invoke(() => { lmpRbtToolB.Fill = brushGray; });
+                        }
+
+                        //lmpRbtToolC
+                        if ((bool)resultsValues[24].Value == true)
+                        {
+                            lmpRbtToolC.Dispatcher.Invoke(() => { lmpRbtToolC.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpRbtToolC.Dispatcher.Invoke(() => { lmpRbtToolC.Fill = brushGray; });
+                        }
+
+                        //lmpRbt1Pick
+                        if ((bool)resultsValues[25].Value == true)
+                        {
+                            lmpRbt1Pick.Dispatcher.Invoke(() => { lmpRbt1Pick.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpRbt1Pick.Dispatcher.Invoke(() => { lmpRbt1Pick.Fill = brushGray; });
+                        }
+
+                        //lmpS1GrpCls
+                        if ((bool)resultsValues[26].Value == true)
+                        {
+                            lmpS1GrpCls.Dispatcher.Invoke(() => { lmpS1GrpCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS1GrpCls.Dispatcher.Invoke(() => { lmpS1GrpCls.Fill = brushGray; });
+                        }
+
+                        //lmpS1GrpOpn
+                        if ((bool)resultsValues[27].Value == true)
+                        {
+                            lmpS1GrpOpn.Dispatcher.Invoke(() => { lmpS1GrpOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS1GrpOpn.Dispatcher.Invoke(() => { lmpS1GrpOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS2GrpCls
+                        if ((bool)resultsValues[28].Value == true)
+                        {
+                            lmpS2GrpCls.Dispatcher.Invoke(() => { lmpS2GrpCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS2GrpCls.Dispatcher.Invoke(() => { lmpS2GrpCls.Fill = brushGray; });
+                        }
+
+                        //lmpS2GrpOpn
+                        if ((bool)resultsValues[29].Value == true)
+                        {
+                            lmpS2GrpOpn.Dispatcher.Invoke(() => { lmpS2GrpOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS2GrpOpn.Dispatcher.Invoke(() => { lmpS2GrpOpn.Fill = brushGray; });
+                        }
+
+                        //lmpT1LoadOpn
+                        if ((bool)resultsValues[30].Value == true)
+                        {
+                            lmpT1LoadOpn.Dispatcher.Invoke(() => { lmpT1LoadOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpT1LoadOpn.Dispatcher.Invoke(() => { lmpT1LoadOpn.Fill = brushGray; });
+                        }
+
+                        //lmpT1LoadCls
+                        if ((bool)resultsValues[31].Value == true)
+                        {
+                            lmpT1LoadCls.Dispatcher.Invoke(() => { lmpT1LoadCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpT1LoadCls.Dispatcher.Invoke(() => { lmpT1LoadCls.Fill = brushGray; });
+                        }
+
+                        //lmpT1LimitCls
+                        if ((bool)resultsValues[32].Value == true)
+                        {
+                            lmpT1LimitCls.Dispatcher.Invoke(() => { lmpT1LimitCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpT1LimitCls.Dispatcher.Invoke(() => { lmpT1LimitCls.Fill = brushGray; });
+                        }
+
+                        //lmpT1LimitOpn
+                        if ((bool)resultsValues[33].Value == true)
+                        {
+                            lmpT1LimitOpn.Dispatcher.Invoke(() => { lmpT1LimitOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpT1LimitOpn.Dispatcher.Invoke(() => { lmpT1LimitOpn.Fill = brushGray; });
+                        }
+
+                        //lmpStopr1Cls
+                        if ((bool)resultsValues[34].Value == true)
+                        {
+                            lmpStopr1Cls.Dispatcher.Invoke(() => { lmpStopr1Cls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpStopr1Cls.Dispatcher.Invoke(() => { lmpStopr1Cls.Fill = brushGray; });
+                        }
+
+                        //lmpStopr2Cls
+                        if ((bool)resultsValues[35].Value == true)
+                        {
+                            lmpStopr2Cls.Dispatcher.Invoke(() => { lmpStopr2Cls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpStopr2Cls.Dispatcher.Invoke(() => { lmpStopr2Cls.Fill = brushGray; });
+                        }
+
+                        //lmpNest0
+                        if ((bool)resultsValues[36].Value == true)
+                        {
+                            lmpNest0.Dispatcher.Invoke(() => { lmpNest0.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpNest0.Dispatcher.Invoke(() => { lmpNest0.Fill = brushGray; });
+                        }
+
+                        //lmpNest2
+                        if ((bool)resultsValues[37].Value == true)
+                        {
+                            lmpNest2.Dispatcher.Invoke(() => { lmpNest2.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpNest2.Dispatcher.Invoke(() => { lmpNest2.Fill = brushGray; });
+                        }
+
+                        //lmpNest1
+                        if ((bool)resultsValues[38].Value == true)
+                        {
+                            lmpNest1.Dispatcher.Invoke(() => { lmpNest1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpNest1.Dispatcher.Invoke(() => { lmpNest1.Fill = brushGray; });
+                        }
+
+                        //lmpS3GrpCls
+                        if ((bool)resultsValues[39].Value == true)
+                        {
+                            lmpS3GrpCls.Dispatcher.Invoke(() => { lmpS3GrpCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS3GrpCls.Dispatcher.Invoke(() => { lmpS3GrpCls.Fill = brushGray; });
+                        }
+
+                        //lmpS3GrpOpn
+                        if ((bool)resultsValues[40].Value == true)
+                        {
+                            lmpS3GrpOpn.Dispatcher.Invoke(() => { lmpS3GrpOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS3GrpOpn.Dispatcher.Invoke(() => { lmpS3GrpOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS3LoadOpn
+                        if ((bool)resultsValues[41].Value == true)
+                        {
+                            lmpS3LoadOpn.Dispatcher.Invoke(() => { lmpS3LoadOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS3LoadOpn.Dispatcher.Invoke(() => { lmpS3LoadOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS3LoadCls
+                        if ((bool)resultsValues[42].Value == true)
+                        {
+                            lmpS3LoadCls.Dispatcher.Invoke(() => { lmpS3LoadCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS3LoadCls.Dispatcher.Invoke(() => { lmpS3LoadCls.Fill = brushGray; });
+                        }
+
+                        //lmpS3GyreOpn
+                        if ((bool)resultsValues[43].Value == true)
+                        {
+                            lmpS3GyreOpn.Dispatcher.Invoke(() => { lmpS3GyreOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS3GyreOpn.Dispatcher.Invoke(() => { lmpS3GyreOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS3GyreCls
+                        if ((bool)resultsValues[44].Value == true)
+                        {
+                            lmpS3GyreCls.Dispatcher.Invoke(() => { lmpS3GyreCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS3GyreCls.Dispatcher.Invoke(() => { lmpS3GyreCls.Fill = brushGray; });
+                        }
+
+                        //lmpS4GrpNCls
+                        if ((bool)resultsValues[45].Value == true)
+                        {
+                            lmpS4GrpNCls.Dispatcher.Invoke(() => { lmpS4GrpNCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4GrpNCls.Dispatcher.Invoke(() => { lmpS4GrpNCls.Fill = brushGray; });
+                        }
+
+                        //lmpS4GrpNOpn
+                        if ((bool)resultsValues[46].Value == true)
+                        {
+                            lmpS4GrpNOpn.Dispatcher.Invoke(() => { lmpS4GrpNOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4GrpNOpn.Dispatcher.Invoke(() => { lmpS4GrpNOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS4GrpRCls
+                        if ((bool)resultsValues[47].Value == true)
+                        {
+                            lmpS4GrpRCls.Dispatcher.Invoke(() => { lmpS4GrpRCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4GrpRCls.Dispatcher.Invoke(() => { lmpS4GrpRCls.Fill = brushGray; });
+                        }
+
+                        //lmpS4GrpROpn
+                        if ((bool)resultsValues[48].Value == true)
+                        {
+                            lmpS4GrpROpn.Dispatcher.Invoke(() => { lmpS4GrpROpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4GrpROpn.Dispatcher.Invoke(() => { lmpS4GrpROpn.Fill = brushGray; });
+                        }
+
+                        //lmpS4GrpLCls
+                        if ((bool)resultsValues[49].Value == true)
+                        {
+                            lmpS4GrpLCls.Dispatcher.Invoke(() => { lmpS4GrpLCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4GrpLCls.Dispatcher.Invoke(() => { lmpS4GrpLCls.Fill = brushGray; });
+                        }
+
+                        //lmpS4GrpLOpn
+                        if ((bool)resultsValues[50].Value == true)
+                        {
+                            lmpS4GrpLOpn.Dispatcher.Invoke(() => { lmpS4GrpLOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4GrpLOpn.Dispatcher.Invoke(() => { lmpS4GrpLOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS4GyreOpn
+                        if ((bool)resultsValues[51].Value == true)
+                        {
+                            lmpS4GyreOpn.Dispatcher.Invoke(() => { lmpS4GyreOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4GyreOpn.Dispatcher.Invoke(() => { lmpS4GyreOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS4GyreCls
+                        if ((bool)resultsValues[52].Value == true)
+                        {
+                            lmpS4GyreCls.Dispatcher.Invoke(() => { lmpS4GyreCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4GyreCls.Dispatcher.Invoke(() => { lmpS4GyreCls.Fill = brushGray; });
+                        }
+
+                        //lmpS4UpDwnOpn
+                        if ((bool)resultsValues[53].Value == true)
+                        {
+                            lmpS4UpDwnOpn.Dispatcher.Invoke(() => { lmpS4UpDwnOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4UpDwnOpn.Dispatcher.Invoke(() => { lmpS4UpDwnOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS4UpDwnCls
+                        if ((bool)resultsValues[54].Value == true)
+                        {
+                            lmpS4UpDwnCls.Dispatcher.Invoke(() => { lmpS4UpDwnCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4UpDwnCls.Dispatcher.Invoke(() => { lmpS4UpDwnCls.Fill = brushGray; });
+                        }
+
+                        //lmpS4TransOpn
+                        if ((bool)resultsValues[55].Value == true)
+                        {
+                            lmpS4TransOpn.Dispatcher.Invoke(() => { lmpS4TransOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4TransOpn.Dispatcher.Invoke(() => { lmpS4TransOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS4TransCls
+                        if ((bool)resultsValues[56].Value == true)
+                        {
+                            lmpS4TransCls.Dispatcher.Invoke(() => { lmpS4TransCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4TransCls.Dispatcher.Invoke(() => { lmpS4TransCls.Fill = brushGray; });
+                        }
+
+                        //lmpS4LoadOpn
+                        if ((bool)resultsValues[57].Value == true)
+                        {
+                            lmpS4LoadOpn.Dispatcher.Invoke(() => { lmpS4LoadOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4LoadOpn.Dispatcher.Invoke(() => { lmpS4LoadOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS4LoadCls
+                        if ((bool)resultsValues[58].Value == true)
+                        {
+                            lmpS4LoadCls.Dispatcher.Invoke(() => { lmpS4LoadCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4LoadCls.Dispatcher.Invoke(() => { lmpS4LoadCls.Fill = brushGray; });
+                        }
+
+                        //lmpS4GrpTCls
+                        if ((bool)resultsValues[59].Value == true)
+                        {
+                            lmpS4GrpTCls.Dispatcher.Invoke(() => { lmpS4GrpTCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4GrpTCls.Dispatcher.Invoke(() => { lmpS4GrpTCls.Fill = brushGray; });
+                        }
+
+                        //lmpS4GrpTOpn
+                        if ((bool)resultsValues[60].Value == true)
+                        {
+                            lmpS4GrpTOpn.Dispatcher.Invoke(() => { lmpS4GrpTOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4GrpTOpn.Dispatcher.Invoke(() => { lmpS4GrpTOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS4ShieldR
+                        if ((bool)resultsValues[61].Value == true)
+                        {
+                            lmpS4ShieldR.Dispatcher.Invoke(() => { lmpS4ShieldR.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4ShieldR.Dispatcher.Invoke(() => { lmpS4ShieldR.Fill = brushGray; });
+                        }
+
+                        //lmpS4ShieldL
+                        if ((bool)resultsValues[62].Value == true)
+                        {
+                            lmpS4ShieldL.Dispatcher.Invoke(() => { lmpS4ShieldL.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS4ShieldL.Dispatcher.Invoke(() => { lmpS4ShieldL.Fill = brushGray; });
+                        }
+
+                        //lmpS5PressROpn
+                        if ((bool)resultsValues[63].Value == true)
+                        {
+                            lmpS5PressROpn.Dispatcher.Invoke(() => { lmpS5PressROpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5PressROpn.Dispatcher.Invoke(() => { lmpS5PressROpn.Fill = brushGray; });
+                        }
+
+                        //lmpS5PressRCls
+                        if ((bool)resultsValues[64].Value == true)
+                        {
+                            lmpS5PressRCls.Dispatcher.Invoke(() => { lmpS5PressRCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5PressRCls.Dispatcher.Invoke(() => { lmpS5PressRCls.Fill = brushGray; });
+                        }
+
+                        //lmpS5GrpTCls
+                        if ((bool)resultsValues[65].Value == true)
+                        {
+                            lmpS5GrpTCls.Dispatcher.Invoke(() => { lmpS5GrpTCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5GrpTCls.Dispatcher.Invoke(() => { lmpS5GrpTCls.Fill = brushGray; });
+                        }
+
+                        //lmpS5GrpTOpn
+                        if ((bool)resultsValues[66].Value == true)
+                        {
+                            lmpS5GrpTOpn.Dispatcher.Invoke(() => { lmpS5GrpTOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5GrpTOpn.Dispatcher.Invoke(() => { lmpS5GrpTOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS5LoadOpn
+                        if ((bool)resultsValues[67].Value == true)
+                        {
+                            lmpS5LoadOpn.Dispatcher.Invoke(() => { lmpS5LoadOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5LoadOpn.Dispatcher.Invoke(() => { lmpS5LoadOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS5LoadCls
+                        if ((bool)resultsValues[68].Value == true)
+                        {
+                            lmpS5LoadCls.Dispatcher.Invoke(() => { lmpS5LoadCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5LoadCls.Dispatcher.Invoke(() => { lmpS5LoadCls.Fill = brushGray; });
+                        }
+
+                        //lmpS5GyreOpn
+                        if ((bool)resultsValues[69].Value == true)
+                        {
+                            lmpS5GyreOpn.Dispatcher.Invoke(() => { lmpS5GyreOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5GyreOpn.Dispatcher.Invoke(() => { lmpS5GyreOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS5GyreCls
+                        if ((bool)resultsValues[70].Value == true)
+                        {
+                            lmpS5GyreCls.Dispatcher.Invoke(() => { lmpS5GyreCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5GyreCls.Dispatcher.Invoke(() => { lmpS5GyreCls.Fill = brushGray; });
+                        }
+
+                        //lmpS5GrpNCls
+                        if ((bool)resultsValues[71].Value == true)
+                        {
+                            lmpS5GrpNCls.Dispatcher.Invoke(() => { lmpS5GrpNCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5GrpNCls.Dispatcher.Invoke(() => { lmpS5GrpNCls.Fill = brushGray; });
+                        }
+
+                        //lmpS5GrpNOpn
+                        if ((bool)resultsValues[72].Value == true)
+                        {
+                            lmpS5GrpNOpn.Dispatcher.Invoke(() => { lmpS5GrpNOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5GrpNOpn.Dispatcher.Invoke(() => { lmpS5GrpNOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS6Plug
+                        if ((bool)resultsValues[73].Value == true)
+                        {
+                            lmpS6Plug.Dispatcher.Invoke(() => { lmpS6Plug.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6Plug.Dispatcher.Invoke(() => { lmpS6Plug.Fill = brushGray; });
+                        }
+
+                        //lmpS6EjctrOpn
+                        if ((bool)resultsValues[74].Value == true)
+                        {
+                            lmpS6EjctrOpn.Dispatcher.Invoke(() => { lmpS6EjctrOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6EjctrOpn.Dispatcher.Invoke(() => { lmpS6EjctrOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS6EjctrCls
+                        if ((bool)resultsValues[75].Value == true)
+                        {
+                            lmpS6EjctrCls.Dispatcher.Invoke(() => { lmpS6EjctrCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6EjctrCls.Dispatcher.Invoke(() => { lmpS6EjctrCls.Fill = brushGray; });
+                        }
+
+                        //lmpS6TransCls
+                        if ((bool)resultsValues[76].Value == true)
+                        {
+                            lmpS6TransCls.Dispatcher.Invoke(() => { lmpS6TransCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6TransCls.Dispatcher.Invoke(() => { lmpS6TransCls.Fill = brushGray; });
+                        }
+
+                        //lmpS6TransOpn
+                        if ((bool)resultsValues[77].Value == true)
+                        {
+                            lmpS6TransOpn.Dispatcher.Invoke(() => { lmpS6TransOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6TransOpn.Dispatcher.Invoke(() => { lmpS6TransOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS6UpDwnOpn
+                        if ((bool)resultsValues[78].Value == true)
+                        {
+                            lmpS6UpDwnOpn.Dispatcher.Invoke(() => { lmpS6UpDwnOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6UpDwnOpn.Dispatcher.Invoke(() => { lmpS6UpDwnOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS6UpDwnCls
+                        if ((bool)resultsValues[79].Value == true)
+                        {
+                            lmpS6UpDwnCls.Dispatcher.Invoke(() => { lmpS6UpDwnCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6UpDwnCls.Dispatcher.Invoke(() => { lmpS6UpDwnCls.Fill = brushGray; });
+                        }
+
+                        //lmpS6InsertOpn
+                        if ((bool)resultsValues[80].Value == true)
+                        {
+                            lmpS6InsertOpn.Dispatcher.Invoke(() => { lmpS6InsertOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6InsertOpn.Dispatcher.Invoke(() => { lmpS6InsertOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS6InsertCls
+                        if ((bool)resultsValues[81].Value == true)
+                        {
+                            lmpS6InsertCls.Dispatcher.Invoke(() => { lmpS6InsertCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6InsertCls.Dispatcher.Invoke(() => { lmpS6InsertCls.Fill = brushGray; });
+                        }
+
+                        //lmpS6SuckOpn
+                        if ((bool)resultsValues[82].Value == true)
+                        {
+                            lmpS6SuckOpn.Dispatcher.Invoke(() => { lmpS6SuckOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6SuckOpn.Dispatcher.Invoke(() => { lmpS6SuckOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS6GrpNCls
+                        if ((bool)resultsValues[83].Value == true)
+                        {
+                            lmpS6GrpNCls.Dispatcher.Invoke(() => { lmpS6GrpNCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6GrpNCls.Dispatcher.Invoke(() => { lmpS6GrpNCls.Fill = brushGray; });
+                        }
+
+                        //lmpS6GrpNOpn
+                        if ((bool)resultsValues[84].Value == true)
+                        {
+                            lmpS6GrpNOpn.Dispatcher.Invoke(() => { lmpS6GrpNOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6GrpNOpn.Dispatcher.Invoke(() => { lmpS6GrpNOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS6GrpTCls
+                        if ((bool)resultsValues[85].Value == true)
+                        {
+                            lmpS6GrpTCls.Dispatcher.Invoke(() => { lmpS6GrpTCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6GrpTCls.Dispatcher.Invoke(() => { lmpS6GrpTCls.Fill = brushGray; });
+                        }
+
+                        //lmpS6GrpTOpn
+                        if ((bool)resultsValues[86].Value == true)
+                        {
+                            lmpS6GrpTOpn.Dispatcher.Invoke(() => { lmpS6GrpTOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6GrpTOpn.Dispatcher.Invoke(() => { lmpS6GrpTOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS6LoadOpn
+                        if ((bool)resultsValues[87].Value == true)
+                        {
+                            lmpS6LoadOpn.Dispatcher.Invoke(() => { lmpS6LoadOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6LoadOpn.Dispatcher.Invoke(() => { lmpS6LoadOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS6LoadCls
+                        if ((bool)resultsValues[88].Value == true)
+                        {
+                            lmpS6LoadCls.Dispatcher.Invoke(() => { lmpS6LoadCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS6LoadCls.Dispatcher.Invoke(() => { lmpS6LoadCls.Fill = brushGray; });
+                        }
+
+                        //lmpS7GrpNCls
+                        if ((bool)resultsValues[89].Value == true)
+                        {
+                            lmpS7GrpNCls.Dispatcher.Invoke(() => { lmpS7GrpNCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7GrpNCls.Dispatcher.Invoke(() => { lmpS7GrpNCls.Fill = brushGray; });
+                        }
+
+                        //lmpS7GrpNOpn
+                        if ((bool)resultsValues[90].Value == true)
+                        {
+                            lmpS7GrpNOpn.Dispatcher.Invoke(() => { lmpS7GrpNOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7GrpNOpn.Dispatcher.Invoke(() => { lmpS7GrpNOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS7LoadOpn
+                        if ((bool)resultsValues[91].Value == true)
+                        {
+                            lmpS7LoadOpn.Dispatcher.Invoke(() => { lmpS7LoadOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7LoadOpn.Dispatcher.Invoke(() => { lmpS7LoadOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS7LoadCls
+                        if ((bool)resultsValues[92].Value == true)
+                        {
+                            lmpS7LoadCls.Dispatcher.Invoke(() => { lmpS7LoadCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7LoadCls.Dispatcher.Invoke(() => { lmpS7LoadCls.Fill = brushGray; });
+                        }
+
+                        //lmpS7PressOpn
+                        if ((bool)resultsValues[93].Value == true)
+                        {
+                            lmpS7PressOpn.Dispatcher.Invoke(() => { lmpS7PressOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7PressOpn.Dispatcher.Invoke(() => { lmpS7PressOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS7PressCls
+                        if ((bool)resultsValues[94].Value == true)
+                        {
+                            lmpS7PressCls.Dispatcher.Invoke(() => { lmpS7PressCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7PressCls.Dispatcher.Invoke(() => { lmpS7PressCls.Fill = brushGray; });
+                        }
+
+                        //lmpS7PinCls
+                        if ((bool)resultsValues[95].Value == true)
+                        {
+                            lmpS7PinCls.Dispatcher.Invoke(() => { lmpS7PinCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7PinCls.Dispatcher.Invoke(() => { lmpS7PinCls.Fill = brushGray; });
+                        }
+
+                        //lmpS7PinOpn
+                        if ((bool)resultsValues[96].Value == true)
+                        {
+                            lmpS7PinOpn.Dispatcher.Invoke(() => { lmpS7PinOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7PinOpn.Dispatcher.Invoke(() => { lmpS7PinOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS7LoadAOpn
+                        if ((bool)resultsValues[97].Value == true)
+                        {
+                            lmpS7LoadAOpn.Dispatcher.Invoke(() => { lmpS7LoadAOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7LoadAOpn.Dispatcher.Invoke(() => { lmpS7LoadAOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS7LoadACls
+                        if ((bool)resultsValues[98].Value == true)
+                        {
+                            lmpS7LoadACls.Dispatcher.Invoke(() => { lmpS7LoadACls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7LoadACls.Dispatcher.Invoke(() => { lmpS7LoadACls.Fill = brushGray; });
+                        }
+
+                        //lmpS7LoadBOpn
+                        if ((bool)resultsValues[99].Value == true)
+                        {
+                            lmpS7LoadBOpn.Dispatcher.Invoke(() => { lmpS7LoadBOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7LoadBOpn.Dispatcher.Invoke(() => { lmpS7LoadBOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS7LoadBCls
+                        if ((bool)resultsValues[100].Value == true)
+                        {
+                            lmpS7LoadBCls.Dispatcher.Invoke(() => { lmpS7LoadBCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7LoadBCls.Dispatcher.Invoke(() => { lmpS7LoadBCls.Fill = brushGray; });
+                        }
+
+                        //lmpS7GrpTCls
+                        if ((bool)resultsValues[101].Value == true)
+                        {
+                            lmpS7GrpTCls.Dispatcher.Invoke(() => { lmpS7GrpTCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7GrpTCls.Dispatcher.Invoke(() => { lmpS7GrpTCls.Fill = brushGray; });
+                        }
+
+                        //lmpS7GrpTOpn
+                        if ((bool)resultsValues[102].Value == true)
+                        {
+                            lmpS7GrpTOpn.Dispatcher.Invoke(() => { lmpS7GrpTOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7GrpTOpn.Dispatcher.Invoke(() => { lmpS7GrpTOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS7Nut
+                        if ((bool)resultsValues[103].Value == true)
+                        {
+                            lmpS7Nut.Dispatcher.Invoke(() => { lmpS7Nut.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7Nut.Dispatcher.Invoke(() => { lmpS7Nut.Fill = brushGray; });
+                        }
+
+                        //lmpS7LvlTest
+                        if ((bool)resultsValues[104].Value == true)
+                        {
+                            lmpS7LvlTest.Dispatcher.Invoke(() => { lmpS7LvlTest.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS7LvlTest.Dispatcher.Invoke(() => { lmpS7LvlTest.Fill = brushGray; });
+                        }
+
+                        //lmpS8GrpNCls
+                        if ((bool)resultsValues[105].Value == true)
+                        {
+                            lmpS8GrpNCls.Dispatcher.Invoke(() => { lmpS8GrpNCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8GrpNCls.Dispatcher.Invoke(() => { lmpS8GrpNCls.Fill = brushGray; });
+                        }
+
+                        //lmpS8GrpNOpn
+                        if ((bool)resultsValues[106].Value == true)
+                        {
+                            lmpS8GrpNOpn.Dispatcher.Invoke(() => { lmpS8GrpNOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8GrpNOpn.Dispatcher.Invoke(() => { lmpS8GrpNOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS8LoadOpn
+                        if ((bool)resultsValues[107].Value == true)
+                        {
+                            lmpS8LoadOpn.Dispatcher.Invoke(() => { lmpS8LoadOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8LoadOpn.Dispatcher.Invoke(() => { lmpS8LoadOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS8LoadCls
+                        if ((bool)resultsValues[108].Value == true)
+                        {
+                            lmpS8LoadCls.Dispatcher.Invoke(() => { lmpS8LoadCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8LoadCls.Dispatcher.Invoke(() => { lmpS8LoadCls.Fill = brushGray; });
+                        }
+
+                        //lmpS8PressOpn
+                        if ((bool)resultsValues[109].Value == true)
+                        {
+                            lmpS8PressOpn.Dispatcher.Invoke(() => { lmpS8PressOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8PressOpn.Dispatcher.Invoke(() => { lmpS8PressOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS8PressCls
+                        if ((bool)resultsValues[110].Value == true)
+                        {
+                            lmpS8PressCls.Dispatcher.Invoke(() => { lmpS8PressCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8PressCls.Dispatcher.Invoke(() => { lmpS8PressCls.Fill = brushGray; });
+                        }
+
+                        //lmpS8PinCls
+                        if ((bool)resultsValues[111].Value == true)
+                        {
+                            lmpS8PinCls.Dispatcher.Invoke(() => { lmpS8PinCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8PinCls.Dispatcher.Invoke(() => { lmpS8PinCls.Fill = brushGray; });
+                        }
+
+                        //lmpS8PinOpn
+                        if ((bool)resultsValues[112].Value == true)
+                        {
+                            lmpS8PinOpn.Dispatcher.Invoke(() => { lmpS8PinOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8PinOpn.Dispatcher.Invoke(() => { lmpS8PinOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS8LoadAOpn
+                        if ((bool)resultsValues[113].Value == true)
+                        {
+                            lmpS8LoadAOpn.Dispatcher.Invoke(() => { lmpS8LoadAOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8LoadAOpn.Dispatcher.Invoke(() => { lmpS8LoadAOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS8LoadACls
+                        if ((bool)resultsValues[114].Value == true)
+                        {
+                            lmpS8LoadACls.Dispatcher.Invoke(() => { lmpS8LoadACls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8LoadACls.Dispatcher.Invoke(() => { lmpS8LoadACls.Fill = brushGray; });
+                        }
+
+                        //lmpS8LoadBOpn
+                        if ((bool)resultsValues[115].Value == true)
+                        {
+                            lmpS8LoadBOpn.Dispatcher.Invoke(() => { lmpS8LoadBOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8LoadBOpn.Dispatcher.Invoke(() => { lmpS8LoadBOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS8LoadBCls
+                        if ((bool)resultsValues[116].Value == true)
+                        {
+                            lmpS8LoadBCls.Dispatcher.Invoke(() => { lmpS8LoadBCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8LoadBCls.Dispatcher.Invoke(() => { lmpS8LoadBCls.Fill = brushGray; });
+                        }
+
+                        //lmpS8GrpTCls
+                        if ((bool)resultsValues[117].Value == true)
+                        {
+                            lmpS8GrpTCls.Dispatcher.Invoke(() => { lmpS8GrpTCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8GrpTCls.Dispatcher.Invoke(() => { lmpS8GrpTCls.Fill = brushGray; });
+                        }
+
+                        //lmpS8GrpTOpn
+                        if ((bool)resultsValues[118].Value == true)
+                        {
+                            lmpS8GrpTOpn.Dispatcher.Invoke(() => { lmpS8GrpTOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8GrpTOpn.Dispatcher.Invoke(() => { lmpS8GrpTOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS8Nut
+                        if ((bool)resultsValues[119].Value == true)
+                        {
+                            lmpS8Nut.Dispatcher.Invoke(() => { lmpS8Nut.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8Nut.Dispatcher.Invoke(() => { lmpS8Nut.Fill = brushGray; });
+                        }
+
+                        //lmpS8LvlTest
+                        if ((bool)resultsValues[120].Value == true)
+                        {
+                            lmpS8LvlTest.Dispatcher.Invoke(() => { lmpS8LvlTest.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS8LvlTest.Dispatcher.Invoke(() => { lmpS8LvlTest.Fill = brushGray; });
+                        }
+
+                        //lmpS9GrpNCls
+                        if ((bool)resultsValues[121].Value == true)
+                        {
+                            lmpS9GrpNCls.Dispatcher.Invoke(() => { lmpS9GrpNCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS9GrpNCls.Dispatcher.Invoke(() => { lmpS9GrpNCls.Fill = brushGray; });
+                        }
+
+                        //lmpS9GrpNOpn
+                        if ((bool)resultsValues[122].Value == true)
+                        {
+                            lmpS9GrpNOpn.Dispatcher.Invoke(() => { lmpS9GrpNOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS9GrpNOpn.Dispatcher.Invoke(() => { lmpS9GrpNOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS9GyreOpn
+                        if ((bool)resultsValues[123].Value == true)
+                        {
+                            lmpS9GyreOpn.Dispatcher.Invoke(() => { lmpS9GyreOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS9GyreOpn.Dispatcher.Invoke(() => { lmpS9GyreOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS9GyreCls
+                        if ((bool)resultsValues[124].Value == true)
+                        {
+                            lmpS9GyreCls.Dispatcher.Invoke(() => { lmpS9GyreCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS9GyreCls.Dispatcher.Invoke(() => { lmpS9GyreCls.Fill = brushGray; });
+                        }
+
+                        //lmpT2TransCls
+                        if ((bool)resultsValues[125].Value == true)
+                        {
+                            lmpT2TransCls.Dispatcher.Invoke(() => { lmpT2TransCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpT2TransCls.Dispatcher.Invoke(() => { lmpT2TransCls.Fill = brushGray; });
+                        }
+
+                        //lmpT2TransOpn
+                        if ((bool)resultsValues[126].Value == true)
+                        {
+                            lmpT2TransOpn.Dispatcher.Invoke(() => { lmpT2TransOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpT2TransOpn.Dispatcher.Invoke(() => { lmpT2TransOpn.Fill = brushGray; });
+                        }
+
+                        //lmpT3LockIn
+                        if ((bool)resultsValues[127].Value == true)
+                        {
+                            lmpT3LockIn.Dispatcher.Invoke(() => { lmpT3LockIn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpT3LockIn.Dispatcher.Invoke(() => { lmpT3LockIn.Fill = brushGray; });
+                        }
+
+                        //lmpT3LockOut
+                        if ((bool)resultsValues[128].Value == true)
+                        {
+                            lmpT3LockOut.Dispatcher.Invoke(() => { lmpT3LockOut.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpT3LockOut.Dispatcher.Invoke(() => { lmpT3LockOut.Fill = brushGray; });
+                        }
+
+                        //lmpT3TransOpn
+                        if ((bool)resultsValues[128].Value == true)
+                        {
+                            lmpT3TransOpn.Dispatcher.Invoke(() => { lmpT3TransOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpT3TransOpn.Dispatcher.Invoke(() => { lmpT3TransOpn.Fill = brushGray; });
+                        }
+
+                        //lmpT3TransCls
+                        if ((bool)resultsValues[130].Value == true)
+                        {
+                            lmpT3TransCls.Dispatcher.Invoke(() => { lmpT3TransCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpT3TransCls.Dispatcher.Invoke(() => { lmpT3TransCls.Fill = brushGray; });
+                        }
+
+                        //lmpS5PressLOpn
+                        if ((bool)resultsValues[131].Value == true)
+                        {
+                            lmpS5PressLOpn.Dispatcher.Invoke(() => { lmpS5PressLOpn.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5PressLOpn.Dispatcher.Invoke(() => { lmpS5PressLOpn.Fill = brushGray; });
+                        }
+
+                        //lmpS5PressLCls
+                        if ((bool)resultsValues[132].Value == true)
+                        {
+                            lmpS5PressLCls.Dispatcher.Invoke(() => { lmpS5PressLCls.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpS5PressLCls.Dispatcher.Invoke(() => { lmpS5PressLCls.Fill = brushGray; });
+                        }
+
+                        //lmpRbt1Home
+                        if ((bool)resultsValues[133].Value == true)
+                        {
+                            lmpRbt1Home1.Dispatcher.Invoke(() => { lmpRbt1Home1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpRbt1Home1.Dispatcher.Invoke(() => { lmpRbt1Home1.Fill = brushGray; });
+                        }
+
+                        //lmpMarkReady
+                        if ((bool)resultsValues[134].Value == true)
+                        {
+                            lmpMarkReady1.Dispatcher.Invoke(() => { lmpMarkReady1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpMarkReady1.Dispatcher.Invoke(() => { lmpMarkReady1.Fill = brushGray; });
+                        }
+
+                        //lmpTrans1Home
+                        if ((bool)resultsValues[135].Value == true)
+                        {
+                            lmpTrans1Home1.Dispatcher.Invoke(() => { lmpTrans1Home1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpTrans1Home1.Dispatcher.Invoke(() => { lmpTrans1Home1.Fill = brushGray; });
+                        }
+
+                        //lmpInletCVHome
+                        if ((bool)resultsValues[136].Value == true)
+                        {
+                            lmpInletCVHome1.Dispatcher.Invoke(() => { lmpInletCVHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpInletCVHome1.Dispatcher.Invoke(() => { lmpInletCVHome1.Fill = brushGray; });
+                        }
+
+                        //lmpPressShldHome
+                        if ((bool)resultsValues[137].Value == true)
+                        {
+                            lmpPressShldHome1.Dispatcher.Invoke(() => { lmpPressShldHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpPressShldHome1.Dispatcher.Invoke(() => { lmpPressShldHome1.Fill = brushGray; });
+                        }
+
+                        //lmpMaxymosReady
+                        if ((bool)resultsValues[138].Value == true)
+                        {
+                            lmpMaxymosReady1.Dispatcher.Invoke(() => { lmpMaxymosReady1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpMaxymosReady1.Dispatcher.Invoke(() => { lmpMaxymosReady1.Fill = brushGray; });
+                        }
+
+                        //lmpInsertShldHome
+                        if ((bool)resultsValues[139].Value == true)
+                        {
+                            lmpInsertShldHome1.Dispatcher.Invoke(() => { lmpInsertShldHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpInsertShldHome1.Dispatcher.Invoke(() => { lmpInsertShldHome1.Fill = brushGray; });
+                        }
+
+                        //lmpPlugHome
+                        if ((bool)resultsValues[140].Value == true)
+                        {
+                            lmpPlugHome1.Dispatcher.Invoke(() => { lmpPlugHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpPlugHome1.Dispatcher.Invoke(() => { lmpPlugHome1.Fill = brushGray; });
+                        }
+
+                        //lmpTrans2Home
+                        if ((bool)resultsValues[141].Value == true)
+                        {
+                            lmpTrans2Home1.Dispatcher.Invoke(() => { lmpTrans2Home1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpTrans2Home1.Dispatcher.Invoke(() => { lmpTrans2Home1.Fill = brushGray; });
+                        }
+
+                        //lmpTrans4Home
+                        if ((bool)resultsValues[142].Value == true)
+                        {
+                            lmpTrans4Home1.Dispatcher.Invoke(() => { lmpTrans4Home1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpTrans4Home1.Dispatcher.Invoke(() => { lmpTrans4Home1.Fill = brushGray; });
+                        }
+
+                        //lmpTrans5Home
+                        if ((bool)resultsValues[143].Value == true)
+                        {
+                            lmpTrans5Home1.Dispatcher.Invoke(() => { lmpTrans5Home1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpTrans5Home1.Dispatcher.Invoke(() => { lmpTrans5Home1.Fill = brushGray; });
+                        }
+
+                        //lmpTrans6Home
+                        if ((bool)resultsValues[144].Value == true)
+                        {
+                            lmpTrans6Home1.Dispatcher.Invoke(() => { lmpTrans6Home1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpTrans6Home1.Dispatcher.Invoke(() => { lmpTrans6Home1.Fill = brushGray; });
+                        }
+
+                        //lmpNutPressHome
+                        if ((bool)resultsValues[145].Value == true)
+                        {
+                            lmpNutPressHome1.Dispatcher.Invoke(() => { lmpNutPressHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpNutPressHome1.Dispatcher.Invoke(() => { lmpNutPressHome1.Fill = brushGray; });
+                        }
+
+                        //lmpMaxymosNutReady1
+                        if ((bool)resultsValues[146].Value == true)
+                        {
+                            lmpMaxymosNutReady1.Dispatcher.Invoke(() => { lmpMaxymosNutReady1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpMaxymosNutReady1.Dispatcher.Invoke(() => { lmpMaxymosNutReady1.Fill = brushGray; });
+                        }
+
+                        //lmpLoadersNutHome
+                        if ((bool)resultsValues[147].Value == true)
+                        {
+                            lmpLoadersNutHome1.Dispatcher.Invoke(() => { lmpLoadersNutHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpLoadersNutHome1.Dispatcher.Invoke(() => { lmpLoadersNutHome1.Fill = brushGray; });
+                        }
+
+                        //lmpRotaryHome
+                        if ((bool)resultsValues[148].Value == true)
+                        {
+                            lmpRotaryHome1.Dispatcher.Invoke(() => { lmpRotaryHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpRotaryHome1.Dispatcher.Invoke(() => { lmpRotaryHome1.Fill = brushGray; });
+                        }
+
+                        //lmpServoHome
+                        if ((bool)resultsValues[149].Value == true)
+                        {
+                            lmpServoHome1.Dispatcher.Invoke(() => { lmpServoHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpServoHome1.Dispatcher.Invoke(() => { lmpServoHome1.Fill = brushGray; });
+                        }
+
+                        //lmpMaxymosPlngReady
+                        if ((bool)resultsValues[150].Value == true)
+                        {
+                            lmpMaxymosPlngReady1.Dispatcher.Invoke(() => { lmpMaxymosPlngReady1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpMaxymosPlngReady1.Dispatcher.Invoke(() => { lmpMaxymosPlngReady1.Fill = brushGray; });
+                        }
+
+                        //lmpRbt2Home
+                        if ((bool)resultsValues[151].Value == true)
+                        {
+                            lmpRbt2Home1.Dispatcher.Invoke(() => { lmpRbt2Home1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpRbt2Home1.Dispatcher.Invoke(() => { lmpRbt2Home1.Fill = brushGray; });
+                        }
+
+                        //lmpRbt3Home
+                        if ((bool)resultsValues[152].Value == true)
+                        {
+                            lmpRbt3Home1.Dispatcher.Invoke(() => { lmpRbt3Home1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpRbt3Home1.Dispatcher.Invoke(() => { lmpRbt3Home1.Fill = brushGray; });
+                        }
+
+                        //lmpLoadArmaHome
+                        if ((bool)resultsValues[153].Value == true)
+                        {
+                            lmpLoadArmaHome1.Dispatcher.Invoke(() => { lmpLoadArmaHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpLoadArmaHome1.Dispatcher.Invoke(() => { lmpLoadArmaHome1.Fill = brushGray; });
+                        }
+
+                        //lmpTorque1Ready
+                        if ((bool)resultsValues[154].Value == true)
+                        {
+                            lmpTorque1Ready1.Dispatcher.Invoke(() => { lmpTorque1Ready1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpTorque1Ready1.Dispatcher.Invoke(() => { lmpTorque1Ready1.Fill = brushGray; });
+                        }
+
+                        //lmpTorque2Ready
+                        if ((bool)resultsValues[155].Value == true)
+                        {
+                            lmpTorque2Ready1.Dispatcher.Invoke(() => { lmpTorque2Ready1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpTorque2Ready1.Dispatcher.Invoke(() => { lmpTorque2Ready1.Fill = brushGray; });
+                        }
+
+                        //lmpSpringHome
+                        if ((bool)resultsValues[156].Value == true)
+                        {
+                            lmpSpringHome1.Dispatcher.Invoke(() => { lmpSpringHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpSpringHome1.Dispatcher.Invoke(() => { lmpSpringHome1.Fill = brushGray; });
+                        }
+
+                        //lmpLatchHome
+                        if ((bool)resultsValues[157].Value == true)
+                        {
+                            lmpLatchHome1.Dispatcher.Invoke(() => { lmpLatchHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpLatchHome1.Dispatcher.Invoke(() => { lmpLatchHome1.Fill = brushGray; });
+                        }
+
+                        //lmpBoltHome
+                        if ((bool)resultsValues[158].Value == true)
+                        {
+                            lmpBoltHome1.Dispatcher.Invoke(() => { lmpBoltHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpBoltHome1.Dispatcher.Invoke(() => { lmpBoltHome1.Fill = brushGray; });
+                        }
+
+                        //lmpPosCorrectHome
+                        if ((bool)resultsValues[159].Value == true)
+                        {
+                            lmpPressHome1.Dispatcher.Invoke(() => { lmpPressHome1.Fill = brushGreen; });
+                        }
+                        else
+                        {
+                            lmpPressHome1.Dispatcher.Invoke(() => { lmpPressHome1.Fill = brushGray; });
+                        }
+
+
+                        #endregion
+
+                        Thread.Sleep(50);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                stpOpcUaLog.Children.Add(new TextBlock() { Text = ($"{DateTime.UtcNow}-----Variables reading error"), Foreground = Brushes.DarkRed });
+                MessageBox.Show("Error de lectura de variables");
+                DisconnectionRequest();
+            }
+        }
         private void GetOpcUAState(CancellationToken _ct)
         {
             try 
@@ -323,7 +1902,6 @@ namespace GigavacFuseApp
                 return;
             } catch { }
         }
-
         private void TasksMonitorMethod(CancellationToken token)
         {
             try
@@ -357,7 +1935,6 @@ namespace GigavacFuseApp
             }
             
         }
-
         private void OpcUaReader(CancellationToken token)
         {
             try
@@ -524,1574 +2101,31 @@ namespace GigavacFuseApp
                         new ReadValueId() {NodeId = "ns=4;s=lmpBoltHome",           AttributeId = Attributes.Value},/*158*/
                         new ReadValueId() {NodeId = "ns=4;s=lmpPosCorrectHome",     AttributeId = Attributes.Value},/*159*/
                     };
+                opcUaGetVarsTask = new Task(new Action(() => { VarOpcUaMonitor(_ctGetVarsTask); }));
+                cancellGetVarsTask = new CancellationTokenSource();
+                _ctGetVarsTask = cancellGetVarsTask.Token;
                 while (!token.IsCancellationRequested)
                 {
-                    opcUaClient.Session.Read(
-                                null,
-                                0,
-                                TimestampsToReturn.Both,
-                                nodesToRead,
-                                out DataValueCollection resultsValues,
-                                out DiagnosticInfoCollection diagnosticInfos);
-
-                    validateResponse(resultsValues, nodesToRead);
-                    //Añadir lectura de variables
-
-                    dspDeviceID.Dispatcher.Invoke(() => { dspDeviceID.Text = (string)resultsValues[0].Value; });
-                    dspLotID.Dispatcher.Invoke(() => { dspLotID.Text = (string)resultsValues[1].Value; });
-                    dspQty.Dispatcher.Invoke(() => { dspQty.Text = (string)resultsValues[2].Value; });
-                    dspSelectedDvcID.Dispatcher.Invoke(() => { dspDeviceID.Text = (string)resultsValues[3].Value; });
-                    dspSelectedLotID.Dispatcher.Invoke(() => { dspLotID.Text = (string)resultsValues[4].Value; });
-                    dspSelectedQty.Dispatcher.Invoke(() => { dspQty.Text = (string)resultsValues[5].Value; });
-
-                    #region lamps
-
-                    //lmpTrayPos1
-                    if ((bool)resultsValues[6].Value == true)
-                    {
-                        lmpTrayPos1.Dispatcher.Invoke(() => { lmpTrayPos1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpTrayPos1.Dispatcher.Invoke(() => { lmpTrayPos1.Fill = brushGray; });
-                    }
-
-                    //lmpTrayPos2
-                    if ((bool)resultsValues[7].Value == true)
-                    {
-                        lmpTrayPos2.Dispatcher.Invoke(() => { lmpTrayPos2.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpTrayPos2.Dispatcher.Invoke(() => { lmpTrayPos2.Fill = brushGray; });
-                    }
-
-                    //lmpTrayPos3
-                    if ((bool)resultsValues[8].Value == true)
-                    {
-                        lmpTrayPos3.Dispatcher.Invoke(() => { lmpTrayPos3.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpTrayPos3.Dispatcher.Invoke(() => { lmpTrayPos3.Fill = brushGray; });
-                    }
-
-                    //lmpStoper1In
-                    if ((bool)resultsValues[9].Value == true)
-                    {
-                        lmpStopr1Opn.Dispatcher.Invoke(() => { lmpStopr1Opn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpStopr1Opn.Dispatcher.Invoke(() => { lmpStopr1Opn.Fill = brushGray; });
-                    }
-
-                    //lmpStoper2In
-                    if ((bool)resultsValues[10].Value == true)
-                    {
-                        lmpStopr2Opn.Dispatcher.Invoke(() => { lmpStopr2Opn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpStopr2Opn.Dispatcher.Invoke(() => { lmpStopr2Opn.Fill = brushGray; });
-                    }
-
-                    //lmpHoldAOpn
-                    if ((bool)resultsValues[11].Value == true)
-                    {
-                        lmpHoldAOpn.Dispatcher.Invoke(() => { lmpHoldAOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpHoldAOpn.Dispatcher.Invoke(() => { lmpHoldAOpn.Fill = brushGray; });
-                    }
-
-                    //lmpHoldACls
-                    if ((bool)resultsValues[12].Value == true)
-                    {
-                        lmpHoldACls.Dispatcher.Invoke(() => { lmpHoldACls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpHoldACls.Dispatcher.Invoke(() => { lmpHoldACls.Fill = brushGray; });
-                    }
-
-                    //lmpHoldBOpn
-                    if ((bool)resultsValues[13].Value == true)
-                    {
-                        lmpHoldBOpn.Dispatcher.Invoke(() => { lmpHoldBOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpHoldBOpn.Dispatcher.Invoke(() => { lmpHoldBOpn.Fill = brushGray; });
-                    }
-
-                    //lmpHoldBCls
-                    if ((bool)resultsValues[14].Value == true)
-                    {
-                        lmpHoldBCls.Dispatcher.Invoke(() => { lmpHoldBCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpHoldBCls.Dispatcher.Invoke(() => { lmpHoldBCls.Fill = brushGray; });
-                    }
-
-                    //lmpHoldCOpn
-                    if ((bool)resultsValues[15].Value == true)
-                    {
-                        lmpHoldCOpn.Dispatcher.Invoke(() => { lmpHoldCOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpHoldCOpn.Dispatcher.Invoke(() => { lmpHoldCOpn.Fill = brushGray; });
-                    }
-
-                    //lmpHoldCCls
-                    if ((bool)resultsValues[16].Value == true)
-                    {
-                        lmpHoldCCls.Dispatcher.Invoke(() => { lmpHoldCCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpHoldCCls.Dispatcher.Invoke(() => { lmpHoldCCls.Fill = brushGray; });
-                    }
-
-                    //lmpEjectOpn
-                    if ((bool)resultsValues[17].Value == true)
-                    {
-                        lmpEjectOpn.Dispatcher.Invoke(() => { lmpEjectOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpEjectOpn.Dispatcher.Invoke(() => { lmpEjectOpn.Fill = brushGray; });
-                    }
-
-                    //lmpEjectCls
-                    if ((bool)resultsValues[18].Value == true)
-                    {
-                        lmpEjectCls.Dispatcher.Invoke(() => { lmpEjectCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpEjectCls.Dispatcher.Invoke(() => { lmpEjectCls.Fill = brushGray; });
-                    }
-
-                    //lmpCheckSide
-                    if ((bool)resultsValues[19].Value == true)
-                    {
-                        lmpCheckSide.Dispatcher.Invoke(() => { lmpCheckSide.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpCheckSide.Dispatcher.Invoke(() => { lmpCheckSide.Fill = brushGray; });
-                    }
-
-                    //lmpRbt1GrpCls
-                    if ((bool)resultsValues[20].Value == true)
-                    {
-                        lmpRbt1GrpCls.Dispatcher.Invoke(() => { lmpRbt1GrpCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpRbt1GrpCls.Dispatcher.Invoke(() => { lmpRbt1GrpCls.Fill = brushGray; });
-                    }
-
-                    //lmpRbt1GrpOpn
-                    if ((bool)resultsValues[21].Value == true)
-                    {
-                        lmpRbt1GrpOpn.Dispatcher.Invoke(() => { lmpRbt1GrpOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpRbt1GrpOpn.Dispatcher.Invoke(() => { lmpRbt1GrpOpn.Fill = brushGray; });
-                    }
-
-                    //lmpRbtToolA
-                    if ((bool)resultsValues[22].Value == true)
-                    {
-                        lmpRbtToolA.Dispatcher.Invoke(() => { lmpRbtToolA.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpRbtToolA.Dispatcher.Invoke(() => { lmpRbtToolA.Fill = brushGray; });
-                    }
-
-                    //lmpRbtToolB
-                    if ((bool)resultsValues[23].Value == true)
-                    {
-                        lmpRbtToolB.Dispatcher.Invoke(() => { lmpRbtToolB.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpRbtToolB.Dispatcher.Invoke(() => { lmpRbtToolB.Fill = brushGray; });
-                    }
-
-                    //lmpRbtToolC
-                    if ((bool)resultsValues[24].Value == true)
-                    {
-                        lmpRbtToolC.Dispatcher.Invoke(() => { lmpRbtToolC.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpRbtToolC.Dispatcher.Invoke(() => { lmpRbtToolC.Fill = brushGray; });
-                    }
-
-                    //lmpRbt1Pick
-                    if ((bool)resultsValues[25].Value == true)
-                    {
-                        lmpRbt1Pick.Dispatcher.Invoke(() => { lmpRbt1Pick.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpRbt1Pick.Dispatcher.Invoke(() => { lmpRbt1Pick.Fill = brushGray; });
-                    }
-
-                    //lmpS1GrpCls
-                    if ((bool)resultsValues[26].Value == true)
-                    {
-                        lmpS1GrpCls.Dispatcher.Invoke(() => { lmpS1GrpCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS1GrpCls.Dispatcher.Invoke(() => { lmpS1GrpCls.Fill = brushGray; });
-                    }
-
-                    //lmpS1GrpOpn
-                    if ((bool)resultsValues[27].Value == true)
-                    {
-                        lmpS1GrpOpn.Dispatcher.Invoke(() => { lmpS1GrpOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS1GrpOpn.Dispatcher.Invoke(() => { lmpS1GrpOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS2GrpCls
-                    if ((bool)resultsValues[28].Value == true)
-                    {
-                        lmpS2GrpCls.Dispatcher.Invoke(() => { lmpS2GrpCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS2GrpCls.Dispatcher.Invoke(() => { lmpS2GrpCls.Fill = brushGray; });
-                    }
-
-                    //lmpS2GrpOpn
-                    if ((bool)resultsValues[29].Value == true)
-                    {
-                        lmpS2GrpOpn.Dispatcher.Invoke(() => { lmpS2GrpOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS2GrpOpn.Dispatcher.Invoke(() => { lmpS2GrpOpn.Fill = brushGray; });
-                    }
-
-                    //lmpT1LoadOpn
-                    if ((bool)resultsValues[30].Value == true)
-                    {
-                        lmpT1LoadOpn.Dispatcher.Invoke(() => { lmpT1LoadOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpT1LoadOpn.Dispatcher.Invoke(() => { lmpT1LoadOpn.Fill = brushGray; });
-                    }
-
-                    //lmpT1LoadCls
-                    if ((bool)resultsValues[31].Value == true)
-                    {
-                        lmpT1LoadCls.Dispatcher.Invoke(() => { lmpT1LoadCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpT1LoadCls.Dispatcher.Invoke(() => { lmpT1LoadCls.Fill = brushGray; });
-                    }
-
-                    //lmpT1LimitCls
-                    if ((bool)resultsValues[32].Value == true)
-                    {
-                        lmpT1LimitCls.Dispatcher.Invoke(() => { lmpT1LimitCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpT1LimitCls.Dispatcher.Invoke(() => { lmpT1LimitCls.Fill = brushGray; });
-                    }
-
-                    //lmpT1LimitOpn
-                    if ((bool)resultsValues[33].Value == true)
-                    {
-                        lmpT1LimitOpn.Dispatcher.Invoke(() => { lmpT1LimitOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpT1LimitOpn.Dispatcher.Invoke(() => { lmpT1LimitOpn.Fill = brushGray; });
-                    }
-
-                    //lmpStopr1Cls
-                    if ((bool)resultsValues[34].Value == true)
-                    {
-                        lmpStopr1Cls.Dispatcher.Invoke(() => { lmpStopr1Cls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpStopr1Cls.Dispatcher.Invoke(() => { lmpStopr1Cls.Fill = brushGray; });
-                    }
-
-                    //lmpStopr2Cls
-                    if ((bool)resultsValues[35].Value == true)
-                    {
-                        lmpStopr2Cls.Dispatcher.Invoke(() => { lmpStopr2Cls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpStopr2Cls.Dispatcher.Invoke(() => { lmpStopr2Cls.Fill = brushGray; });
-                    }
-
-                    //lmpNest0
-                    if ((bool)resultsValues[36].Value == true)
-                    {
-                        lmpNest0.Dispatcher.Invoke(() => { lmpNest0.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpNest0.Dispatcher.Invoke(() => { lmpNest0.Fill = brushGray; });
-                    }
-
-                    //lmpNest2
-                    if ((bool)resultsValues[37].Value == true)
-                    {
-                        lmpNest2.Dispatcher.Invoke(() => { lmpNest2.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpNest2.Dispatcher.Invoke(() => { lmpNest2.Fill = brushGray; });
-                    }
-
-                    //lmpNest1
-                    if ((bool)resultsValues[38].Value == true)
-                    {
-                        lmpNest1.Dispatcher.Invoke(() => { lmpNest1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpNest1.Dispatcher.Invoke(() => { lmpNest1.Fill = brushGray; });
-                    }
-
-                    //lmpS3GrpCls
-                    if ((bool)resultsValues[39].Value == true)
-                    {
-                        lmpS3GrpCls.Dispatcher.Invoke(() => { lmpS3GrpCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS3GrpCls.Dispatcher.Invoke(() => { lmpS3GrpCls.Fill = brushGray; });
-                    }
-
-                    //lmpS3GrpOpn
-                    if ((bool)resultsValues[40].Value == true)
-                    {
-                        lmpS3GrpOpn.Dispatcher.Invoke(() => { lmpS3GrpOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS3GrpOpn.Dispatcher.Invoke(() => { lmpS3GrpOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS3LoadOpn
-                    if ((bool)resultsValues[41].Value == true)
-                    {
-                        lmpS3LoadOpn.Dispatcher.Invoke(() => { lmpS3LoadOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS3LoadOpn.Dispatcher.Invoke(() => { lmpS3LoadOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS3LoadCls
-                    if ((bool)resultsValues[42].Value == true)
-                    {
-                        lmpS3LoadCls.Dispatcher.Invoke(() => { lmpS3LoadCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS3LoadCls.Dispatcher.Invoke(() => { lmpS3LoadCls.Fill = brushGray; });
-                    }
-
-                    //lmpS3GyreOpn
-                    if ((bool)resultsValues[43].Value == true)
-                    {
-                        lmpS3GyreOpn.Dispatcher.Invoke(() => { lmpS3GyreOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS3GyreOpn.Dispatcher.Invoke(() => { lmpS3GyreOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS3GyreCls
-                    if ((bool)resultsValues[44].Value == true)
-                    {
-                        lmpS3GyreCls.Dispatcher.Invoke(() => { lmpS3GyreCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS3GyreCls.Dispatcher.Invoke(() => { lmpS3GyreCls.Fill = brushGray; });
-                    }
-
-                    //lmpS4GrpNCls
-                    if ((bool)resultsValues[45].Value == true)
-                    {
-                        lmpS4GrpNCls.Dispatcher.Invoke(() => { lmpS4GrpNCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4GrpNCls.Dispatcher.Invoke(() => { lmpS4GrpNCls.Fill = brushGray; });
-                    }
-
-                    //lmpS4GrpNOpn
-                    if ((bool)resultsValues[46].Value == true)
-                    {
-                        lmpS4GrpNOpn.Dispatcher.Invoke(() => { lmpS4GrpNOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4GrpNOpn.Dispatcher.Invoke(() => { lmpS4GrpNOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS4GrpRCls
-                    if ((bool)resultsValues[47].Value == true)
-                    {
-                        lmpS4GrpRCls.Dispatcher.Invoke(() => { lmpS4GrpRCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4GrpRCls.Dispatcher.Invoke(() => { lmpS4GrpRCls.Fill = brushGray; });
-                    }
-
-                    //lmpS4GrpROpn
-                    if ((bool)resultsValues[48].Value == true)
-                    {
-                        lmpS4GrpROpn.Dispatcher.Invoke(() => { lmpS4GrpROpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4GrpROpn.Dispatcher.Invoke(() => { lmpS4GrpROpn.Fill = brushGray; });
-                    }
-
-                    //lmpS4GrpLCls
-                    if ((bool)resultsValues[49].Value == true)
-                    {
-                        lmpS4GrpLCls.Dispatcher.Invoke(() => { lmpS4GrpLCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4GrpLCls.Dispatcher.Invoke(() => { lmpS4GrpLCls.Fill = brushGray; });
-                    }
-
-                    //lmpS4GrpLOpn
-                    if ((bool)resultsValues[50].Value == true)
-                    {
-                        lmpS4GrpLOpn.Dispatcher.Invoke(() => { lmpS4GrpLOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4GrpLOpn.Dispatcher.Invoke(() => { lmpS4GrpLOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS4GyreOpn
-                    if ((bool)resultsValues[51].Value == true)
-                    {
-                        lmpS4GyreOpn.Dispatcher.Invoke(() => { lmpS4GyreOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4GyreOpn.Dispatcher.Invoke(() => { lmpS4GyreOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS4GyreCls
-                    if ((bool)resultsValues[52].Value == true)
-                    {
-                        lmpS4GyreCls.Dispatcher.Invoke(() => { lmpS4GyreCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4GyreCls.Dispatcher.Invoke(() => { lmpS4GyreCls.Fill = brushGray; });
-                    }
-
-                    //lmpS4UpDwnOpn
-                    if ((bool)resultsValues[53].Value == true)
-                    {
-                        lmpS4UpDwnOpn.Dispatcher.Invoke(() => { lmpS4UpDwnOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4UpDwnOpn.Dispatcher.Invoke(() => { lmpS4UpDwnOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS4UpDwnCls
-                    if ((bool)resultsValues[54].Value == true)
-                    {
-                        lmpS4UpDwnCls.Dispatcher.Invoke(() => { lmpS4UpDwnCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4UpDwnCls.Dispatcher.Invoke(() => { lmpS4UpDwnCls.Fill = brushGray; });
-                    }
-
-                    //lmpS4TransOpn
-                    if ((bool)resultsValues[55].Value == true)
-                    {
-                        lmpS4TransOpn.Dispatcher.Invoke(() => { lmpS4TransOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4TransOpn.Dispatcher.Invoke(() => { lmpS4TransOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS4TransCls
-                    if ((bool)resultsValues[56].Value == true)
-                    {
-                        lmpS4TransCls.Dispatcher.Invoke(() => { lmpS4TransCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4TransCls.Dispatcher.Invoke(() => { lmpS4TransCls.Fill = brushGray; });
-                    }
-
-                    //lmpS4LoadOpn
-                    if ((bool)resultsValues[57].Value == true)
-                    {
-                        lmpS4LoadOpn.Dispatcher.Invoke(() => { lmpS4LoadOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4LoadOpn.Dispatcher.Invoke(() => { lmpS4LoadOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS4LoadCls
-                    if ((bool)resultsValues[58].Value == true)
-                    {
-                        lmpS4LoadCls.Dispatcher.Invoke(() => { lmpS4LoadCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4LoadCls.Dispatcher.Invoke(() => { lmpS4LoadCls.Fill = brushGray; });
-                    }
-
-                    //lmpS4GrpTCls
-                    if ((bool)resultsValues[59].Value == true)
-                    {
-                        lmpS4GrpTCls.Dispatcher.Invoke(() => { lmpS4GrpTCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4GrpTCls.Dispatcher.Invoke(() => { lmpS4GrpTCls.Fill = brushGray; });
-                    }
-
-                    //lmpS4GrpTOpn
-                    if ((bool)resultsValues[60].Value == true)
-                    {
-                        lmpS4GrpTOpn.Dispatcher.Invoke(() => { lmpS4GrpTOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4GrpTOpn.Dispatcher.Invoke(() => { lmpS4GrpTOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS4ShieldR
-                    if ((bool)resultsValues[61].Value == true)
-                    {
-                        lmpS4ShieldR.Dispatcher.Invoke(() => { lmpS4ShieldR.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4ShieldR.Dispatcher.Invoke(() => { lmpS4ShieldR.Fill = brushGray; });
-                    }
-
-                    //lmpS4ShieldL
-                    if ((bool)resultsValues[62].Value == true)
-                    {
-                        lmpS4ShieldL.Dispatcher.Invoke(() => { lmpS4ShieldL.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS4ShieldL.Dispatcher.Invoke(() => { lmpS4ShieldL.Fill = brushGray; });
-                    }
-
-                    //lmpS5PressROpn
-                    if ((bool)resultsValues[63].Value == true)
-                    {
-                        lmpS5PressROpn.Dispatcher.Invoke(() => { lmpS5PressROpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5PressROpn.Dispatcher.Invoke(() => { lmpS5PressROpn.Fill = brushGray; });
-                    }
-
-                    //lmpS5PressRCls
-                    if ((bool)resultsValues[64].Value == true)
-                    {
-                        lmpS5PressRCls.Dispatcher.Invoke(() => { lmpS5PressRCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5PressRCls.Dispatcher.Invoke(() => { lmpS5PressRCls.Fill = brushGray; });
-                    }
-
-                    //lmpS5GrpTCls
-                    if ((bool)resultsValues[65].Value == true)
-                    {
-                        lmpS5GrpTCls.Dispatcher.Invoke(() => { lmpS5GrpTCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5GrpTCls.Dispatcher.Invoke(() => { lmpS5GrpTCls.Fill = brushGray; });
-                    }
-
-                    //lmpS5GrpTOpn
-                    if ((bool)resultsValues[66].Value == true)
-                    {
-                        lmpS5GrpTOpn.Dispatcher.Invoke(() => { lmpS5GrpTOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5GrpTOpn.Dispatcher.Invoke(() => { lmpS5GrpTOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS5LoadOpn
-                    if ((bool)resultsValues[67].Value == true)
-                    {
-                        lmpS5LoadOpn.Dispatcher.Invoke(() => { lmpS5LoadOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5LoadOpn.Dispatcher.Invoke(() => { lmpS5LoadOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS5LoadCls
-                    if ((bool)resultsValues[68].Value == true)
-                    {
-                        lmpS5LoadCls.Dispatcher.Invoke(() => { lmpS5LoadCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5LoadCls.Dispatcher.Invoke(() => { lmpS5LoadCls.Fill = brushGray; });
-                    }
-
-                    //lmpS5GyreOpn
-                    if ((bool)resultsValues[69].Value == true)
-                    {
-                        lmpS5GyreOpn.Dispatcher.Invoke(() => { lmpS5GyreOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5GyreOpn.Dispatcher.Invoke(() => { lmpS5GyreOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS5GyreCls
-                    if ((bool)resultsValues[70].Value == true)
-                    {
-                        lmpS5GyreCls.Dispatcher.Invoke(() => { lmpS5GyreCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5GyreCls.Dispatcher.Invoke(() => { lmpS5GyreCls.Fill = brushGray; });
-                    }
-
-                    //lmpS5GrpNCls
-                    if ((bool)resultsValues[71].Value == true)
-                    {
-                        lmpS5GrpNCls.Dispatcher.Invoke(() => { lmpS5GrpNCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5GrpNCls.Dispatcher.Invoke(() => { lmpS5GrpNCls.Fill = brushGray; });
-                    }
-
-                    //lmpS5GrpNOpn
-                    if ((bool)resultsValues[72].Value == true)
-                    {
-                        lmpS5GrpNOpn.Dispatcher.Invoke(() => { lmpS5GrpNOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5GrpNOpn.Dispatcher.Invoke(() => { lmpS5GrpNOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS6Plug
-                    if ((bool)resultsValues[73].Value == true)
-                    {
-                        lmpS6Plug.Dispatcher.Invoke(() => { lmpS6Plug.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6Plug.Dispatcher.Invoke(() => { lmpS6Plug.Fill = brushGray; });
-                    }
-
-                    //lmpS6EjctrOpn
-                    if ((bool)resultsValues[74].Value == true)
-                    {
-                        lmpS6EjctrOpn.Dispatcher.Invoke(() => { lmpS6EjctrOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6EjctrOpn.Dispatcher.Invoke(() => { lmpS6EjctrOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS6EjctrCls
-                    if ((bool)resultsValues[75].Value == true)
-                    {
-                        lmpS6EjctrCls.Dispatcher.Invoke(() => { lmpS6EjctrCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6EjctrCls.Dispatcher.Invoke(() => { lmpS6EjctrCls.Fill = brushGray; });
-                    }
-
-                    //lmpS6TransCls
-                    if ((bool)resultsValues[76].Value == true)
-                    {
-                        lmpS6TransCls.Dispatcher.Invoke(() => { lmpS6TransCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6TransCls.Dispatcher.Invoke(() => { lmpS6TransCls.Fill = brushGray; });
-                    }
-
-                    //lmpS6TransOpn
-                    if ((bool)resultsValues[77].Value == true)
-                    {
-                        lmpS6TransOpn.Dispatcher.Invoke(() => { lmpS6TransOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6TransOpn.Dispatcher.Invoke(() => { lmpS6TransOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS6UpDwnOpn
-                    if ((bool)resultsValues[78].Value == true)
-                    {
-                        lmpS6UpDwnOpn.Dispatcher.Invoke(() => { lmpS6UpDwnOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6UpDwnOpn.Dispatcher.Invoke(() => { lmpS6UpDwnOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS6UpDwnCls
-                    if ((bool)resultsValues[79].Value == true)
-                    {
-                        lmpS6UpDwnCls.Dispatcher.Invoke(() => { lmpS6UpDwnCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6UpDwnCls.Dispatcher.Invoke(() => { lmpS6UpDwnCls.Fill = brushGray; });
-                    }
-
-                    //lmpS6InsertOpn
-                    if ((bool)resultsValues[80].Value == true)
-                    {
-                        lmpS6InsertOpn.Dispatcher.Invoke(() => { lmpS6InsertOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6InsertOpn.Dispatcher.Invoke(() => { lmpS6InsertOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS6InsertCls
-                    if ((bool)resultsValues[81].Value == true)
-                    {
-                        lmpS6InsertCls.Dispatcher.Invoke(() => { lmpS6InsertCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6InsertCls.Dispatcher.Invoke(() => { lmpS6InsertCls.Fill = brushGray; });
-                    }
-
-                    //lmpS6SuckOpn
-                    if ((bool)resultsValues[82].Value == true)
-                    {
-                        lmpS6SuckOpn.Dispatcher.Invoke(() => { lmpS6SuckOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6SuckOpn.Dispatcher.Invoke(() => { lmpS6SuckOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS6GrpNCls
-                    if ((bool)resultsValues[83].Value == true)
-                    {
-                        lmpS6GrpNCls.Dispatcher.Invoke(() => { lmpS6GrpNCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6GrpNCls.Dispatcher.Invoke(() => { lmpS6GrpNCls.Fill = brushGray; });
-                    }
-
-                    //lmpS6GrpNOpn
-                    if ((bool)resultsValues[84].Value == true)
-                    {
-                        lmpS6GrpNOpn.Dispatcher.Invoke(() => { lmpS6GrpNOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6GrpNOpn.Dispatcher.Invoke(() => { lmpS6GrpNOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS6GrpTCls
-                    if ((bool)resultsValues[85].Value == true)
-                    {
-                        lmpS6GrpTCls.Dispatcher.Invoke(() => { lmpS6GrpTCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6GrpTCls.Dispatcher.Invoke(() => { lmpS6GrpTCls.Fill = brushGray; });
-                    }
-
-                    //lmpS6GrpTOpn
-                    if ((bool)resultsValues[86].Value == true)
-                    {
-                        lmpS6GrpTOpn.Dispatcher.Invoke(() => { lmpS6GrpTOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6GrpTOpn.Dispatcher.Invoke(() => { lmpS6GrpTOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS6LoadOpn
-                    if ((bool)resultsValues[87].Value == true)
-                    {
-                        lmpS6LoadOpn.Dispatcher.Invoke(() => { lmpS6LoadOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6LoadOpn.Dispatcher.Invoke(() => { lmpS6LoadOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS6LoadCls
-                    if ((bool)resultsValues[88].Value == true)
-                    {
-                        lmpS6LoadCls.Dispatcher.Invoke(() => { lmpS6LoadCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS6LoadCls.Dispatcher.Invoke(() => { lmpS6LoadCls.Fill = brushGray; });
-                    }
-
-                    //lmpS7GrpNCls
-                    if ((bool)resultsValues[89].Value == true)
-                    {
-                        lmpS7GrpNCls.Dispatcher.Invoke(() => { lmpS7GrpNCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7GrpNCls.Dispatcher.Invoke(() => { lmpS7GrpNCls.Fill = brushGray; });
-                    }
-
-                    //lmpS7GrpNOpn
-                    if ((bool)resultsValues[90].Value == true)
-                    {
-                        lmpS7GrpNOpn.Dispatcher.Invoke(() => { lmpS7GrpNOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7GrpNOpn.Dispatcher.Invoke(() => { lmpS7GrpNOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS7LoadOpn
-                    if ((bool)resultsValues[91].Value == true)
-                    {
-                        lmpS7LoadOpn.Dispatcher.Invoke(() => { lmpS7LoadOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7LoadOpn.Dispatcher.Invoke(() => { lmpS7LoadOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS7LoadCls
-                    if ((bool)resultsValues[92].Value == true)
-                    {
-                        lmpS7LoadCls.Dispatcher.Invoke(() => { lmpS7LoadCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7LoadCls.Dispatcher.Invoke(() => { lmpS7LoadCls.Fill = brushGray; });
-                    }
-
-                    //lmpS7PressOpn
-                    if ((bool)resultsValues[93].Value == true)
-                    {
-                        lmpS7PressOpn.Dispatcher.Invoke(() => { lmpS7PressOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7PressOpn.Dispatcher.Invoke(() => { lmpS7PressOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS7PressCls
-                    if ((bool)resultsValues[94].Value == true)
-                    {
-                        lmpS7PressCls.Dispatcher.Invoke(() => { lmpS7PressCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7PressCls.Dispatcher.Invoke(() => { lmpS7PressCls.Fill = brushGray; });
-                    }
-
-                    //lmpS7PinCls
-                    if ((bool)resultsValues[95].Value == true)
-                    {
-                        lmpS7PinCls.Dispatcher.Invoke(() => { lmpS7PinCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7PinCls.Dispatcher.Invoke(() => { lmpS7PinCls.Fill = brushGray; });
-                    }
-
-                    //lmpS7PinOpn
-                    if ((bool)resultsValues[96].Value == true)
-                    {
-                        lmpS7PinOpn.Dispatcher.Invoke(() => { lmpS7PinOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7PinOpn.Dispatcher.Invoke(() => { lmpS7PinOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS7LoadAOpn
-                    if ((bool)resultsValues[97].Value == true)
-                    {
-                        lmpS7LoadAOpn.Dispatcher.Invoke(() => { lmpS7LoadAOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7LoadAOpn.Dispatcher.Invoke(() => { lmpS7LoadAOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS7LoadACls
-                    if ((bool)resultsValues[98].Value == true)
-                    {
-                        lmpS7LoadACls.Dispatcher.Invoke(() => { lmpS7LoadACls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7LoadACls.Dispatcher.Invoke(() => { lmpS7LoadACls.Fill = brushGray; });
-                    }
-
-                    //lmpS7LoadBOpn
-                    if ((bool)resultsValues[99].Value == true)
-                    {
-                        lmpS7LoadBOpn.Dispatcher.Invoke(() => { lmpS7LoadBOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7LoadBOpn.Dispatcher.Invoke(() => { lmpS7LoadBOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS7LoadBCls
-                    if ((bool)resultsValues[100].Value == true)
-                    {
-                        lmpS7LoadBCls.Dispatcher.Invoke(() => { lmpS7LoadBCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7LoadBCls.Dispatcher.Invoke(() => { lmpS7LoadBCls.Fill = brushGray; });
-                    }
-
-                    //lmpS7GrpTCls
-                    if ((bool)resultsValues[101].Value == true)
-                    {
-                        lmpS7GrpTCls.Dispatcher.Invoke(() => { lmpS7GrpTCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7GrpTCls.Dispatcher.Invoke(() => { lmpS7GrpTCls.Fill = brushGray; });
-                    }
-
-                    //lmpS7GrpTOpn
-                    if ((bool)resultsValues[102].Value == true)
-                    {
-                        lmpS7GrpTOpn.Dispatcher.Invoke(() => { lmpS7GrpTOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7GrpTOpn.Dispatcher.Invoke(() => { lmpS7GrpTOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS7Nut
-                    if ((bool)resultsValues[103].Value == true)
-                    {
-                        lmpS7Nut.Dispatcher.Invoke(() => { lmpS7Nut.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7Nut.Dispatcher.Invoke(() => { lmpS7Nut.Fill = brushGray; });
-                    }
-
-                    //lmpS7LvlTest
-                    if ((bool)resultsValues[104].Value == true)
-                    {
-                        lmpS7LvlTest.Dispatcher.Invoke(() => { lmpS7LvlTest.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS7LvlTest.Dispatcher.Invoke(() => { lmpS7LvlTest.Fill = brushGray; });
-                    }
-
-                    //lmpS8GrpNCls
-                    if ((bool)resultsValues[105].Value == true)
-                    {
-                        lmpS8GrpNCls.Dispatcher.Invoke(() => { lmpS8GrpNCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8GrpNCls.Dispatcher.Invoke(() => { lmpS8GrpNCls.Fill = brushGray; });
-                    }
-
-                    //lmpS8GrpNOpn
-                    if ((bool)resultsValues[106].Value == true)
-                    {
-                        lmpS8GrpNOpn.Dispatcher.Invoke(() => { lmpS8GrpNOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8GrpNOpn.Dispatcher.Invoke(() => { lmpS8GrpNOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS8LoadOpn
-                    if ((bool)resultsValues[107].Value == true)
-                    {
-                        lmpS8LoadOpn.Dispatcher.Invoke(() => { lmpS8LoadOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8LoadOpn.Dispatcher.Invoke(() => { lmpS8LoadOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS8LoadCls
-                    if ((bool)resultsValues[108].Value == true)
-                    {
-                        lmpS8LoadCls.Dispatcher.Invoke(() => { lmpS8LoadCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8LoadCls.Dispatcher.Invoke(() => { lmpS8LoadCls.Fill = brushGray; });
-                    }
-
-                    //lmpS8PressOpn
-                    if ((bool)resultsValues[109].Value == true)
-                    {
-                        lmpS8PressOpn.Dispatcher.Invoke(() => { lmpS8PressOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8PressOpn.Dispatcher.Invoke(() => { lmpS8PressOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS8PressCls
-                    if ((bool)resultsValues[110].Value == true)
-                    {
-                        lmpS8PressCls.Dispatcher.Invoke(() => { lmpS8PressCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8PressCls.Dispatcher.Invoke(() => { lmpS8PressCls.Fill = brushGray; });
-                    }
-
-                    //lmpS8PinCls
-                    if ((bool)resultsValues[111].Value == true)
-                    {
-                        lmpS8PinCls.Dispatcher.Invoke(() => { lmpS8PinCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8PinCls.Dispatcher.Invoke(() => { lmpS8PinCls.Fill = brushGray; });
-                    }
-
-                    //lmpS8PinOpn
-                    if ((bool)resultsValues[112].Value == true)
-                    {
-                        lmpS8PinOpn.Dispatcher.Invoke(() => { lmpS8PinOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8PinOpn.Dispatcher.Invoke(() => { lmpS8PinOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS8LoadAOpn
-                    if ((bool)resultsValues[113].Value == true)
-                    {
-                        lmpS8LoadAOpn.Dispatcher.Invoke(() => { lmpS8LoadAOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8LoadAOpn.Dispatcher.Invoke(() => { lmpS8LoadAOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS8LoadACls
-                    if ((bool)resultsValues[114].Value == true)
-                    {
-                        lmpS8LoadACls.Dispatcher.Invoke(() => { lmpS8LoadACls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8LoadACls.Dispatcher.Invoke(() => { lmpS8LoadACls.Fill = brushGray; });
-                    }
-
-                    //lmpS8LoadBOpn
-                    if ((bool)resultsValues[115].Value == true)
-                    {
-                        lmpS8LoadBOpn.Dispatcher.Invoke(() => { lmpS8LoadBOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8LoadBOpn.Dispatcher.Invoke(() => { lmpS8LoadBOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS8LoadBCls
-                    if ((bool)resultsValues[116].Value == true)
-                    {
-                        lmpS8LoadBCls.Dispatcher.Invoke(() => { lmpS8LoadBCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8LoadBCls.Dispatcher.Invoke(() => { lmpS8LoadBCls.Fill = brushGray; });
-                    }
-
-                    //lmpS8GrpTCls
-                    if ((bool)resultsValues[117].Value == true)
-                    {
-                        lmpS8GrpTCls.Dispatcher.Invoke(() => { lmpS8GrpTCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8GrpTCls.Dispatcher.Invoke(() => { lmpS8GrpTCls.Fill = brushGray; });
-                    }
-
-                    //lmpS8GrpTOpn
-                    if ((bool)resultsValues[118].Value == true)
-                    {
-                        lmpS8GrpTOpn.Dispatcher.Invoke(() => { lmpS8GrpTOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8GrpTOpn.Dispatcher.Invoke(() => { lmpS8GrpTOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS8Nut
-                    if ((bool)resultsValues[119].Value == true)
-                    {
-                        lmpS8Nut.Dispatcher.Invoke(() => { lmpS8Nut.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8Nut.Dispatcher.Invoke(() => { lmpS8Nut.Fill = brushGray; });
-                    }
-
-                    //lmpS8LvlTest
-                    if ((bool)resultsValues[120].Value == true)
-                    {
-                        lmpS8LvlTest.Dispatcher.Invoke(() => { lmpS8LvlTest.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS8LvlTest.Dispatcher.Invoke(() => { lmpS8LvlTest.Fill = brushGray; });
-                    }
-
-                    //lmpS9GrpNCls
-                    if ((bool)resultsValues[121].Value == true)
-                    {
-                        lmpS9GrpNCls.Dispatcher.Invoke(() => { lmpS9GrpNCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS9GrpNCls.Dispatcher.Invoke(() => { lmpS9GrpNCls.Fill = brushGray; });
-                    }
-
-                    //lmpS9GrpNOpn
-                    if ((bool)resultsValues[122].Value == true)
-                    {
-                        lmpS9GrpNOpn.Dispatcher.Invoke(() => { lmpS9GrpNOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS9GrpNOpn.Dispatcher.Invoke(() => { lmpS9GrpNOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS9GyreOpn
-                    if ((bool)resultsValues[123].Value == true)
-                    {
-                        lmpS9GyreOpn.Dispatcher.Invoke(() => { lmpS9GyreOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS9GyreOpn.Dispatcher.Invoke(() => { lmpS9GyreOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS9GyreCls
-                    if ((bool)resultsValues[124].Value == true)
-                    {
-                        lmpS9GyreCls.Dispatcher.Invoke(() => { lmpS9GyreCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS9GyreCls.Dispatcher.Invoke(() => { lmpS9GyreCls.Fill = brushGray; });
-                    }
-
-                    //lmpT2TransCls
-                    if ((bool)resultsValues[125].Value == true)
-                    {
-                        lmpT2TransCls.Dispatcher.Invoke(() => { lmpT2TransCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpT2TransCls.Dispatcher.Invoke(() => { lmpT2TransCls.Fill = brushGray; });
-                    }
-
-                    //lmpT2TransOpn
-                    if ((bool)resultsValues[126].Value == true)
-                    {
-                        lmpT2TransOpn.Dispatcher.Invoke(() => { lmpT2TransOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpT2TransOpn.Dispatcher.Invoke(() => { lmpT2TransOpn.Fill = brushGray; });
-                    }
-
-                    //lmpT3LockIn
-                    if ((bool)resultsValues[127].Value == true)
-                    {
-                        lmpT3LockIn.Dispatcher.Invoke(() => { lmpT3LockIn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpT3LockIn.Dispatcher.Invoke(() => { lmpT3LockIn.Fill = brushGray; });
-                    }
-
-                    //lmpT3LockOut
-                    if ((bool)resultsValues[128].Value == true)
-                    {
-                        lmpT3LockOut.Dispatcher.Invoke(() => { lmpT3LockOut.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpT3LockOut.Dispatcher.Invoke(() => { lmpT3LockOut.Fill = brushGray; });
-                    }
-
-                    //lmpT3TransOpn
-                    if ((bool)resultsValues[128].Value == true)
-                    {
-                        lmpT3TransOpn.Dispatcher.Invoke(() => { lmpT3TransOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpT3TransOpn.Dispatcher.Invoke(() => { lmpT3TransOpn.Fill = brushGray; });
-                    }
-
-                    //lmpT3TransCls
-                    if ((bool)resultsValues[130].Value == true)
-                    {
-                        lmpT3TransCls.Dispatcher.Invoke(() => { lmpT3TransCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpT3TransCls.Dispatcher.Invoke(() => { lmpT3TransCls.Fill = brushGray; });
-                    }
-
-                    //lmpS5PressLOpn
-                    if ((bool)resultsValues[131].Value == true)
-                    {
-                        lmpS5PressLOpn.Dispatcher.Invoke(() => { lmpS5PressLOpn.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5PressLOpn.Dispatcher.Invoke(() => { lmpS5PressLOpn.Fill = brushGray; });
-                    }
-
-                    //lmpS5PressLCls
-                    if ((bool)resultsValues[132].Value == true)
-                    {
-                        lmpS5PressLCls.Dispatcher.Invoke(() => { lmpS5PressLCls.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpS5PressLCls.Dispatcher.Invoke(() => { lmpS5PressLCls.Fill = brushGray; });
-                    }
-
-                    //lmpRbt1Home
-                    if ((bool)resultsValues[133].Value == true)
-                    {
-                        lmpRbt1Home1.Dispatcher.Invoke(() => { lmpRbt1Home1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpRbt1Home1.Dispatcher.Invoke(() => { lmpRbt1Home1.Fill = brushGray; });
-                    }
-
-                    //lmpMarkReady
-                    if ((bool)resultsValues[134].Value == true)
-                    {
-                        lmpMarkReady1.Dispatcher.Invoke(() => { lmpMarkReady1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpMarkReady1.Dispatcher.Invoke(() => { lmpMarkReady1.Fill = brushGray; });
-                    }
-
-                    //lmpTrans1Home
-                    if ((bool)resultsValues[135].Value == true)
-                    {
-                        lmpTrans1Home1.Dispatcher.Invoke(() => { lmpTrans1Home1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpTrans1Home1.Dispatcher.Invoke(() => { lmpTrans1Home1.Fill = brushGray; });
-                    }
-
-                    //lmpInletCVHome
-                    if ((bool)resultsValues[136].Value == true)
-                    {
-                        lmpInletCVHome1.Dispatcher.Invoke(() => { lmpInletCVHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpInletCVHome1.Dispatcher.Invoke(() => { lmpInletCVHome1.Fill = brushGray; });
-                    }
-
-                    //lmpPressShldHome
-                    if ((bool)resultsValues[137].Value == true)
-                    {
-                        lmpPressShldHome1.Dispatcher.Invoke(() => { lmpPressShldHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpPressShldHome1.Dispatcher.Invoke(() => { lmpPressShldHome1.Fill = brushGray; });
-                    }
-
-                    //lmpMaxymosReady
-                    if ((bool)resultsValues[138].Value == true)
-                    {
-                        lmpMaxymosReady1.Dispatcher.Invoke(() => { lmpMaxymosReady1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpMaxymosReady1.Dispatcher.Invoke(() => { lmpMaxymosReady1.Fill = brushGray; });
-                    }
-
-                    //lmpInsertShldHome
-                    if ((bool)resultsValues[139].Value == true)
-                    {
-                        lmpInsertShldHome1.Dispatcher.Invoke(() => { lmpInsertShldHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpInsertShldHome1.Dispatcher.Invoke(() => { lmpInsertShldHome1.Fill = brushGray; });
-                    }
-
-                    //lmpPlugHome
-                    if ((bool)resultsValues[140].Value == true)
-                    {
-                        lmpPlugHome1.Dispatcher.Invoke(() => { lmpPlugHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpPlugHome1.Dispatcher.Invoke(() => { lmpPlugHome1.Fill = brushGray; });
-                    }
-
-                    //lmpTrans2Home
-                    if ((bool)resultsValues[141].Value == true)
-                    {
-                        lmpTrans2Home1.Dispatcher.Invoke(() => { lmpTrans2Home1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpTrans2Home1.Dispatcher.Invoke(() => { lmpTrans2Home1.Fill = brushGray; });
-                    }
-
-                    //lmpTrans4Home
-                    if ((bool)resultsValues[142].Value == true)
-                    {
-                        lmpTrans4Home1.Dispatcher.Invoke(() => { lmpTrans4Home1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpTrans4Home1.Dispatcher.Invoke(() => { lmpTrans4Home1.Fill = brushGray; });
-                    }
-
-                    //lmpTrans5Home
-                    if ((bool)resultsValues[143].Value == true)
-                    {
-                        lmpTrans5Home1.Dispatcher.Invoke(() => { lmpTrans5Home1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpTrans5Home1.Dispatcher.Invoke(() => { lmpTrans5Home1.Fill = brushGray; });
-                    }
-
-                    //lmpTrans6Home
-                    if ((bool)resultsValues[144].Value == true)
-                    {
-                        lmpTrans6Home1.Dispatcher.Invoke(() => { lmpTrans6Home1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpTrans6Home1.Dispatcher.Invoke(() => { lmpTrans6Home1.Fill = brushGray; });
-                    }
-
-                    //lmpNutPressHome
-                    if ((bool)resultsValues[145].Value == true)
-                    {
-                        lmpNutPressHome1.Dispatcher.Invoke(() => { lmpNutPressHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpNutPressHome1.Dispatcher.Invoke(() => { lmpNutPressHome1.Fill = brushGray; });
-                    }
-
-                    //lmpMaxymosNutReady1
-                    if ((bool)resultsValues[146].Value == true)
-                    {
-                        lmpMaxymosNutReady1.Dispatcher.Invoke(() => { lmpMaxymosNutReady1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpMaxymosNutReady1.Dispatcher.Invoke(() => { lmpMaxymosNutReady1.Fill = brushGray; });
-                    }
-
-                    //lmpLoadersNutHome
-                    if ((bool)resultsValues[147].Value == true)
-                    {
-                        lmpLoadersNutHome1.Dispatcher.Invoke(() => { lmpLoadersNutHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpLoadersNutHome1.Dispatcher.Invoke(() => { lmpLoadersNutHome1.Fill = brushGray; });
-                    }
-
-                    //lmpRotaryHome
-                    if ((bool)resultsValues[148].Value == true)
-                    {
-                        lmpRotaryHome1.Dispatcher.Invoke(() => { lmpRotaryHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpRotaryHome1.Dispatcher.Invoke(() => { lmpRotaryHome1.Fill = brushGray; });
-                    }
-
-                    //lmpServoHome
-                    if ((bool)resultsValues[149].Value == true)
-                    {
-                        lmpServoHome1.Dispatcher.Invoke(() => { lmpServoHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpServoHome1.Dispatcher.Invoke(() => { lmpServoHome1.Fill = brushGray; });
-                    }
-
-                    //lmpMaxymosPlngReady
-                    if ((bool)resultsValues[150].Value == true)
-                    {
-                        lmpMaxymosPlngReady1.Dispatcher.Invoke(() => { lmpMaxymosPlngReady1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpMaxymosPlngReady1.Dispatcher.Invoke(() => { lmpMaxymosPlngReady1.Fill = brushGray; });
-                    }
-
-                    //lmpRbt2Home
-                    if ((bool)resultsValues[151].Value == true)
-                    {
-                        lmpRbt2Home1.Dispatcher.Invoke(() => { lmpRbt2Home1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpRbt2Home1.Dispatcher.Invoke(() => { lmpRbt2Home1.Fill = brushGray; });
-                    }
-
-                    //lmpRbt3Home
-                    if ((bool)resultsValues[152].Value == true)
-                    {
-                        lmpRbt3Home1.Dispatcher.Invoke(() => { lmpRbt3Home1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpRbt3Home1.Dispatcher.Invoke(() => { lmpRbt3Home1.Fill = brushGray; });
-                    }
-
-                    //lmpLoadArmaHome
-                    if ((bool)resultsValues[153].Value == true)
-                    {
-                        lmpLoadArmaHome1.Dispatcher.Invoke(() => { lmpLoadArmaHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpLoadArmaHome1.Dispatcher.Invoke(() => { lmpLoadArmaHome1.Fill = brushGray; });
-                    }
-
-                    //lmpTorque1Ready
-                    if ((bool)resultsValues[154].Value == true)
-                    {
-                        lmpTorque1Ready1.Dispatcher.Invoke(() => { lmpTorque1Ready1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpTorque1Ready1.Dispatcher.Invoke(() => { lmpTorque1Ready1.Fill = brushGray; });
-                    }
-
-                    //lmpTorque2Ready
-                    if ((bool)resultsValues[155].Value == true)
-                    {
-                        lmpTorque2Ready1.Dispatcher.Invoke(() => { lmpTorque2Ready1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpTorque2Ready1.Dispatcher.Invoke(() => { lmpTorque2Ready1.Fill = brushGray; });
-                    }
-
-                    //lmpSpringHome
-                    if ((bool)resultsValues[156].Value == true)
-                    {
-                        lmpSpringHome1.Dispatcher.Invoke(() => { lmpSpringHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpSpringHome1.Dispatcher.Invoke(() => { lmpSpringHome1.Fill = brushGray; });
-                    }
-
-                    //lmpLatchHome
-                    if ((bool)resultsValues[157].Value == true)
-                    {
-                        lmpLatchHome1.Dispatcher.Invoke(() => { lmpLatchHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpLatchHome1.Dispatcher.Invoke(() => { lmpLatchHome1.Fill = brushGray; });
-                    }
-
-                    //lmpBoltHome
-                    if ((bool)resultsValues[158].Value == true)
-                    {
-                        lmpBoltHome.Dispatcher.Invoke(() => { lmpBoltHome.Fill = brushGreen; });
-                        lmpBoltHome1.Dispatcher.Invoke(() => { lmpBoltHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpBoltHome.Dispatcher.Invoke(() => { lmpBoltHome.Fill = brushGray; });
-                        lmpBoltHome1.Dispatcher.Invoke(() => { lmpBoltHome1.Fill = brushGray; });
-                    }
-
-                    //lmpPosCorrectHome
-                    if ((bool)resultsValues[159].Value == true)
-                    {
-                        lmpPressHome1.Dispatcher.Invoke(() => { lmpPressHome1.Fill = brushGreen; });
-                    }
-                    else
-                    {
-                        lmpPressHome1.Dispatcher.Invoke(() => { lmpPressHome1.Fill = brushGray; });
-                    }
-
-
-                    #endregion
-
-                    Thread.Sleep(50);
+                    try
+                    {
+                        opcUaClient.Session.Read(
+                                    null,
+                                    0,
+                                    TimestampsToReturn.Both,
+                                    nodesToRead,
+                                    out tempResultValues/*DataValueCollection resultsValues*/,
+                                    out DiagnosticInfoCollection diagnosticInfos);
+
+                        validateResponse(tempResultValues, nodesToRead);
+                        resultsValues = tempResultValues;
+                        if (opcUaGetVarsTask.Status != TaskStatus.Running)
+                        {
+                            opcUaGetVarsTask.Start();
+                        }
+                        //VarOpcUaMonitor(_ctGetVarsTask);
+
+                        Thread.Sleep(50);
+                    } catch (Exception) { }
                 }
                 stpOpcUaLog.Dispatcher.Invoke(() => {
                     stpOpcUaLog.Children.Add(new TextBlock() { Text = $"{DateTime.Now}-----Monitor stopped", Foreground = Brushes.DarkRed }); });
@@ -2104,7 +2138,6 @@ namespace GigavacFuseApp
                 });
             }
         }
-
         private void OpcUaBoolWriter(string nodeId, bool state) {
             try
             {
@@ -2152,25 +2185,26 @@ namespace GigavacFuseApp
                 disconnectCmd = true;
             }
         }
-
         private void CloseProcess()
         {
             DisconnectionRequest();
             if (getTimeTask != null)
-            {
-                cancellGetDateTask.Cancel();
-            }
+            { cancellGetDateTask.Cancel();}
+
             if (opcUaGetStatusTask != null)
-            {
-                cancellGetStatusTask.Cancel();
-            }
+            { cancellGetStatusTask.Cancel();}
+
+            if (opcUaGetVarsTask != null)
+            { cancellGetVarsTask.Cancel();}
 
         }
+
         #endregion
 
-        private void ClosingWindow(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void ClosingWindow(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            CloseProcess();
+            await Task.Run(() => { CloseProcess(); });
+            MessageBox.Show("Opc Ua disconnected.");
         }
 
         private void MnuConnectClick(object sender, RoutedEventArgs e)
