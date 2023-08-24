@@ -1,0 +1,43 @@
+﻿<Window x:Class="GigavacFuseApp.MarkInfo"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GigavacFuseApp"
+        mc:Ignorable="d"
+        Title="Información de marcado" SizeToContent="WidthAndHeight" Icon="/Assets/LogoSINTEC S.png"
+        WindowStartupLocation="CenterScreen">
+    <Grid Background="#FFE5E5E5">
+        <StackPanel Orientation="Vertical" Margin="10,10,10,10">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="String de marcado:" VerticalAlignment="Center" 
+                       Foreground="#FF124981" Width="130" Background="Beige"/>
+                <TextBox Grid.Column="1" FontSize="13"
+                         Name="dspMrkData" Margin="5"
+                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Lectura de marcado:" VerticalAlignment="Center"
+                       Foreground="#FF124981" Width="130" Background="Beige"/>
+                <TextBox Grid.Column="1" FontSize="13"
+                         Name="dspReadData" Margin="5"
+                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="String anterior:" VerticalAlignment="Center"
+                       Foreground="#FF124981" Width="130"  Background="Beige"/>
+                <TextBox Grid.Column="1" FontSize="13"
+                         Name="dspMrkOldData" Margin="5"
+                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+            </StackPanel>
+            <Button Content="Cerrar" Click="BtnClsMrkInfo" />
+        </StackPanel>
+
+    </Grid>
+</Window>

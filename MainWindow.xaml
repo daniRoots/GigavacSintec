@@ -5,13 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GigavacFuseApp"
         mc:Ignorable="d"
-        Title="Sensata | Gigavac" Height="768" Width="1024" Icon="/Assets/LogoSINTEC S.png" Closing="ClosingWindow">
+        Title="Sensata | Gigavac" Icon="/Assets/LogoSINTEC S.png" Closing="ClosingWindow" Width="1090" Height="800"
+        MinWidth="1050" MinHeight="750" WindowStartupLocation="CenterScreen">
 
     <Grid>
-        <!--<Grid.ColumnDefinitions>
-            <ColumnDefinition Width="183*"/>
-            <ColumnDefinition Width="334*"/>
-        </Grid.ColumnDefinitions>-->
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
@@ -32,295 +29,536 @@
         </Grid>
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
             <TabControl TabStripPlacement="Left">
-                <TabItem Header="Preparación" Height="40" Width="150" FontSize="15" >
+                <TabItem Header="Manufactura" Height="40" Width="150" FontSize="15" >
                     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                        <Grid Background="#FFE5E5E5">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="62*"/>
-                                <RowDefinition Height="51*"/>
-                                <RowDefinition Height="274.08"/>
-                            </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0">
-                                <Label Content="Lot Manager" FontSize="20" Foreground="#FF124981" FontWeight="Bold"/>
-                                <Grid Width="792" HorizontalAlignment="Center">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                        <GroupBox BorderThickness="2" BorderBrush="#FF124981" Width="277" Background="White">
-                                            <GroupBox.Header>
-                                                <Label Content="New lot" Background="#FF124981" Foreground="White" FontSize="13"/>
-                                            </GroupBox.Header>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="80"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="*"/>
-                                                    <RowDefinition Height="*"/>
-                                                    <RowDefinition Height="*"/>
-                                                </Grid.RowDefinitions>
-                                                <Label Grid.Column="0" Grid.Row="0" FontSize="14"
+                        <TabControl>
+                            <TabItem Header="Lot Manager" FontSize="12">
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="62*"/>
+                                        <RowDefinition Height="51*"/>
+                                        <RowDefinition Height="274.08"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0">
+                                        <Label Content="Lot Manager" FontSize="20" Foreground="#FF124981" FontWeight="Bold"/>
+                                        <Grid Width="792" HorizontalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                                <GroupBox BorderThickness="2" BorderBrush="#FF124981" Width="277" Background="White">
+                                                    <GroupBox.Header>
+                                                        <Label Content="New lot" Background="#FF124981" Foreground="White" FontSize="13"/>
+                                                    </GroupBox.Header>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="80"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="*"/>
+                                                        </Grid.RowDefinitions>
+                                                        <Label Grid.Column="0" Grid.Row="0" FontSize="14"
                                                            Content="Device ID:" FontWeight="Bold" VerticalContentAlignment="Center"/>
-                                                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center">
-                                                    <TextBox Name="dspDeviceID" Background="WhiteSmoke" FontSize="13" Text="Model"
+                                                        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center">
+                                                            <TextBox Name="dspDeviceID" Background="WhiteSmoke" FontSize="13" Text="Model"
                                                              Width="100" Height="30" HorizontalAlignment="Left" HorizontalContentAlignment="Right"
                                                              BorderBrush="Black" Margin="0,2,0,2" VerticalContentAlignment="Center" Padding="5,0,0,0" Focusable="False"/>
-                                                    <Button x:Name="btnDeviceID" Width="55" Height="30" FontSize="13"
-                                                                    Content="Select" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                                                    <Rectangle Name="lmpDeviceID" HorizontalAlignment="Left" Height="30" 
+                                                            <Button x:Name="btnDeviceID" Width="55" Height="30" FontSize="13"
+                                                                    Content="Select" VerticalAlignment="Center" Margin="5,0,0,0" PreviewMouseLeftButtonDown="BtnDeviceIDPress" PreviewMouseLeftButtonUp="BtnDeviceIDRelease"/>
+                                                            <Rectangle Name="lmpDeviceID" HorizontalAlignment="Left" Height="30" 
                                                                        Margin="1,0,0,0" VerticalAlignment="Center" Width="15" 
                                                                        StrokeThickness="1">
-                                                        <Rectangle.Fill>
-                                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                                <GradientStop Color="Gray" Offset="1"/>
-                                                                <GradientStop Color="White" Offset="0.481"/>
-                                                                <GradientStop Color="Gray" Offset="0"/>
-                                                            </LinearGradientBrush>
-                                                        </Rectangle.Fill>
-                                                    </Rectangle>
-                                                </StackPanel>
-                                                <Label Grid.Column="0" Grid.Row="1" FontSize="15"
+                                                                <Rectangle.Fill>
+                                                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                        <GradientStop Color="Gray" Offset="1"/>
+                                                                        <GradientStop Color="White" Offset="0.481"/>
+                                                                        <GradientStop Color="Gray" Offset="0"/>
+                                                                    </LinearGradientBrush>
+                                                                </Rectangle.Fill>
+                                                            </Rectangle>
+                                                        </StackPanel>
+                                                        <Label Grid.Column="0" Grid.Row="1" FontSize="15"
                                                            Content="Lot ID:" FontWeight="Bold" VerticalAlignment="Center"/>
-                                                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center">
-                                                    <TextBox Name="dspLotID" FontSize="13" Text="Lot ID" Background="WhiteSmoke"
+                                                        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center">
+                                                            <TextBox Name="dspLotID" FontSize="13" Text="Lot ID" Background="WhiteSmoke"
                                                              Width="100" Height="30" HorizontalAlignment="Left" BorderBrush="Black" HorizontalContentAlignment="Right"
                                                              Margin="0,2,0,2" IsEnabled="True" Focusable="False" VerticalContentAlignment="Center" Padding="5,0,0,0"/>
-                                                    <Button x:Name="btnLotID" Width="55" Height="30" FontSize="13"
-                                                                    Content="Select" Margin="5,0,0,0"/>
-                                                    <Rectangle Name="lmpLotID" HorizontalAlignment="Left" Height="30" 
+                                                            <Button x:Name="btnLotID" Width="55" Height="30" FontSize="13"
+                                                                    Content="Select" Margin="5,0,0,0" PreviewMouseLeftButtonDown="BtnLotIDPress" PreviewMouseLeftButtonUp="BtnLotIDRelease"/>
+                                                            <Rectangle Name="lmpLotID" HorizontalAlignment="Left" Height="30" 
                                                                        Margin="1,0,0,0" VerticalAlignment="Center" Width="15" 
                                                                        StrokeThickness="1">
-                                                        <Rectangle.Fill>
-                                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                                <GradientStop Color="Gray" Offset="1"/>
-                                                                <GradientStop Color="White" Offset="0.481"/>
-                                                                <GradientStop Color="Gray" Offset="0"/>
-                                                            </LinearGradientBrush>
-                                                        </Rectangle.Fill>
-                                                    </Rectangle>
-                                                </StackPanel>
-                                                <Label Grid.Column="0" Grid.Row="2"  FontSize="15"
+                                                                <Rectangle.Fill>
+                                                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                        <GradientStop Color="Gray" Offset="1"/>
+                                                                        <GradientStop Color="White" Offset="0.481"/>
+                                                                        <GradientStop Color="Gray" Offset="0"/>
+                                                                    </LinearGradientBrush>
+                                                                </Rectangle.Fill>
+                                                            </Rectangle>
+                                                        </StackPanel>
+                                                        <Label Grid.Column="0" Grid.Row="2"  FontSize="15"
                                                            Content="Cantidad:" FontWeight="Bold" VerticalAlignment="Center"/>
-                                                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="2">
-                                                    <TextBox Grid.Column="1" Grid.Row="2" FontSize="13" Text="Quantity" Background="WhiteSmoke"
+                                                        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="2">
+                                                            <TextBox Grid.Column="1" Grid.Row="2" FontSize="13" Text="0" Background="WhiteSmoke"
                                                                Name="dspQty" HorizontalContentAlignment="Right"
                                                                Width="100" Height="30" HorizontalAlignment="Left" BorderBrush="Black"
                                                                Margin="0,2,0,2" IsEnabled="True" Focusable="False" VerticalContentAlignment="Center" Padding="5,0,0,0"/>
-                                                    <Button x:Name="btnQty" Width="55" Height="30" FontSize="13"
-                                                                    Content="Select" Margin="5,0,0,0"/>
-                                                    <Rectangle Name="lmpQty" HorizontalAlignment="Left" Height="30" 
+                                                            <Button x:Name="btnQty" Width="55" Height="30" FontSize="13"
+                                                                    Content="Select" Margin="5,0,0,0" PreviewMouseLeftButtonDown="BtnQtyPress" PreviewMouseLeftButtonUp="BtnQtyRelease"/>
+                                                            <Rectangle Name="lmpQty" HorizontalAlignment="Left" Height="30" 
                                                                        Margin="1,0,0,0" VerticalAlignment="Center" Width="15" 
                                                                        StrokeThickness="1">
-                                                        <Rectangle.Fill>
-                                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                                <GradientStop Color="Gray" Offset="1"/>
-                                                                <GradientStop Color="White" Offset="0.481"/>
-                                                                <GradientStop Color="Gray" Offset="0"/>
-                                                            </LinearGradientBrush>
-                                                        </Rectangle.Fill>
-                                                    </Rectangle>
+                                                                <Rectangle.Fill>
+                                                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                        <GradientStop Color="Gray" Offset="1"/>
+                                                                        <GradientStop Color="White" Offset="0.481"/>
+                                                                        <GradientStop Color="Gray" Offset="0"/>
+                                                                    </LinearGradientBrush>
+                                                                </Rectangle.Fill>
+                                                            </Rectangle>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </GroupBox>
+                                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                    <Button Name="btnNewLot" Width="80" Height="40" Margin="10" Content="New" BorderBrush="DarkOliveGreen" BorderThickness="2" Click="BtnNewLot"/>
+                                                    <Button Name="btnEndLot" Width="80" Height="40" Margin="10" Content="End" BorderBrush="DarkRed" BorderThickness="2"/>
                                                 </StackPanel>
-                                            </Grid>
-                                        </GroupBox>
-                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                            <Button Width="80" Height="40" Margin="10" Content="New" BorderBrush="DarkOliveGreen" BorderThickness="2"/>
-                                            <Button Width="80" Height="40" Margin="10" Content="End" BorderBrush="DarkRed" BorderThickness="2"/>
-                                        </StackPanel>
-                                    </StackPanel>
-                                    <GroupBox Grid.Column="1" BorderThickness="2" BorderBrush="#FF811E12" Background="White" HorizontalAlignment="Center" Width="265">
-                                        <GroupBox.Header>
-                                            <Label Content="Current lot" Background="#FF811E12" Foreground="White" FontSize="13"/>
-                                        </GroupBox.Header>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="90"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="*"/>
-                                            </Grid.RowDefinitions>
-                                            <Label Grid.Column="0" Grid.Row="0" FontSize="15"
+                                            </StackPanel>
+                                            <GroupBox Grid.Column="1" BorderThickness="2" BorderBrush="#FF811E12" Background="White" HorizontalAlignment="Center" Width="265">
+                                                <GroupBox.Header>
+                                                    <Label Content="Current lot" Background="#FF811E12" Foreground="White" FontSize="13"/>
+                                                </GroupBox.Header>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="90"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Label Grid.Column="0" Grid.Row="0" FontSize="15"
                                                            Content="Device ID:" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="Device ID"
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="Device ID"
                                                      Name="dspSelectedDvcID" Background="WhiteSmoke"
                                                      Width="100" Height="30" HorizontalAlignment="Left"
                                                      BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" Focusable="False"
                                                      VerticalContentAlignment="center" HorizontalContentAlignment="Right"/>
-                                            <Label Grid.Column="0" Grid.Row="1" FontSize="15"
+                                                    <Label Grid.Column="0" Grid.Row="1" FontSize="15"
                                                    Content="Lot ID:" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <TextBox Grid.Column="1" Grid.Row="1" FontSize="13" Text="Lot ID"
+                                                    <TextBox Grid.Column="1" Grid.Row="1" FontSize="13" Text="Lot ID"
                                                      Name="dspSelectedLotID" Background="WhiteSmoke"
                                                      Width="100" HorizontalAlignment="Left" BorderBrush="Black"
                                                      Margin="0,2,0,2" IsEnabled="True" Focusable="False"
                                                      VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
-                                            <Label Grid.Column="0" Grid.Row="2" 
+                                                    <Label Grid.Column="0" Grid.Row="2" 
                                                    Content="Cantidad:" FontWeight="Bold" FontSize="15"
                                                    VerticalContentAlignment="Center"/>
-                                            <TextBox Grid.Column="1" Grid.Row="2" FontSize="13" Text="Quantity"
+                                                    <TextBox Grid.Column="1" Grid.Row="2" FontSize="13" Text="Quantity"
                                                      Name="dspSelectedQty" Background="WhiteSmoke"
                                                      Width="100" HorizontalAlignment="Left" BorderBrush="Black"
                                                      Margin="0,2,0,2" IsEnabled="True" Focusable="False"
                                                      VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
-                                        </Grid>
-                                    </GroupBox>
+                                                </Grid>
+                                            </GroupBox>
 
-                                </Grid>
-                            </StackPanel>
-                            <Grid Grid.Row="1" Margin="0,9,0,0">
-                                <GroupBox BorderThickness="2" BorderBrush="#FF124981" Height="130" VerticalAlignment="Top" HorizontalAlignment="Center" Width="840">
-                                    <GroupBox.Header>
-                                        <Label Content="SQL Database Info." Background="#FF124981" Foreground="White" FontSize="13"/>
-                                    </GroupBox.Header>
-                                    <Grid>
+                                        </Grid>
+                                    </StackPanel>
+                                    <Grid Grid.Row="1" Margin="0,9,0,0">
+                                        <GroupBox BorderThickness="2" BorderBrush="#FF124981" Height="130" VerticalAlignment="Top" HorizontalAlignment="Center" Width="840">
+                                            <GroupBox.Header>
+                                                <Label Content="SQL Database Info." Background="#FF124981" Foreground="White" FontSize="13"/>
+                                            </GroupBox.Header>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid Grid.Column="0">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="110*"/>
+                                                        <ColumnDefinition Width="153*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Label Grid.Column="0" Grid.Row="0" FontSize="14"
+                                                           Content="Server name:" FontWeight="Normal" VerticalContentAlignment="Center"
+                                                           VerticalAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Name="dspServer" Background="White" FontSize="13" Text="Server name"
+                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
+                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
+                                                             Padding="0,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
+                                                    <Label Grid.Column="0" Grid.Row="1" FontSize="14" VerticalAlignment="Center"
+                                                           Content="Database name:" FontWeight="Normal" VerticalContentAlignment="Center" Grid.ColumnSpan="2" Height="28" Margin="0,0,151,0"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="1" Name="dspDatabase" Background="White" FontSize="13" Text="Database name"
+                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
+                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
+                                                             Padding="5,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
+                                                </Grid>
+                                                <Grid Grid.Column="1">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="110*"/>
+                                                        <ColumnDefinition Width="144*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Label Grid.Column="0" Grid.Row="0" FontSize="14"
+                                                           Content="Machine name:" FontWeight="Normal" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" Name="dspMchnName" Background="White" FontSize="13" Text="Machine name"
+                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
+                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
+                                                             Padding="0,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
+                                                    <Label Grid.Column="0" Grid.Row="1" FontSize="14" VerticalAlignment="Center"
+                                                           Content="Machine No.:" FontWeight="Normal" VerticalContentAlignment="Center" Height="28"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="1" Name="dspMchnNo" Background="White" FontSize="13" Text="Machine no."
+                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
+                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
+                                                             Padding="0,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
+                                                </Grid>
+                                                <Grid Grid.Column="2">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="115*"/>
+                                                        <ColumnDefinition Width="144*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Label Grid.Column="0" Grid.Row="0" FontSize="14" VerticalAlignment="Center"
+                                                           Content="Machine ID:" FontWeight="Normal" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" Name="dspMchnID" Background="White" FontSize="13" Text="Machine ID"
+                                                             Width="132" Height="30" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
+                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
+                                                             Padding="0,0,0,0" Focusable="False"/>
+                                                    <Label Grid.Column="0" Grid.Row="1" FontSize="14" VerticalAlignment="Center"
+                                                           Content="Machine No.:" FontWeight="Normal" VerticalContentAlignment="Center" Height="28" Margin="0,0,12,0"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="1" Name="dspEqmntID" Background="White" FontSize="13" Text="Machine no."
+                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
+                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
+                                                             Padding="0,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
+                                                    <Label Grid.Column="0" Grid.Row="2" FontSize="14" VerticalAlignment="Center"
+                                                           Content="Assig/Check ID.:" FontWeight="Normal" VerticalContentAlignment="Center" Height="28" Margin="0,0,12,0"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="2" Name="dspChckID" Background="White" FontSize="13" Text="Check ID"
+                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
+                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
+                                                             Padding="0,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
+                                    <Grid Grid.Row="2" Margin="0,12,0,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        <Grid Grid.Column="0">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="*"/>
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="110*"/>
-                                                <ColumnDefinition Width="153*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Label Grid.Column="0" Grid.Row="0" FontSize="14"
-                                                           Content="Server name:" FontWeight="Normal" VerticalContentAlignment="Center"
-                                                           VerticalAlignment="Center"/>
-                                            <TextBox Grid.Column="1" Name="dspServer" Background="White" FontSize="13" Text="Server name"
-                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
-                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
-                                                             Padding="0,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
-                                            <Label Grid.Column="0" Grid.Row="1" FontSize="14" VerticalAlignment="Center"
-                                                           Content="Database name:" FontWeight="Normal" VerticalContentAlignment="Center" Grid.ColumnSpan="2" Height="28" Margin="0,0,151,0"/>
-                                            <TextBox Grid.Column="1" Grid.Row="1" Name="dspDatabase" Background="White" FontSize="13" Text="Database name"
-                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
-                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
-                                                             Padding="5,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <Grid Grid.Column="1">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="*"/>
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="110*"/>
-                                                <ColumnDefinition Width="144*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Label Grid.Column="0" Grid.Row="0" FontSize="14"
-                                                           Content="Machine name:" FontWeight="Normal" VerticalContentAlignment="Center"/>
-                                            <TextBox Grid.Column="1" Grid.Row="0" Name="dspMchnName" Background="White" FontSize="13" Text="Machine name"
-                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
-                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
-                                                             Padding="0,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
-                                            <Label Grid.Column="0" Grid.Row="1" FontSize="14" VerticalAlignment="Center"
-                                                           Content="Machine No.:" FontWeight="Normal" VerticalContentAlignment="Center" Height="28"/>
-                                            <TextBox Grid.Column="1" Grid.Row="1" Name="dspMchnNo" Background="White" FontSize="13" Text="Machine no."
-                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
-                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
-                                                             Padding="0,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <Grid Grid.Column="2">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="*"/>
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="115*"/>
-                                                <ColumnDefinition Width="144*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Label Grid.Column="0" Grid.Row="0" FontSize="14" VerticalAlignment="Center"
-                                                           Content="Machine ID:" FontWeight="Normal" VerticalContentAlignment="Center"/>
-                                            <TextBox Grid.Column="1" Grid.Row="0" Name="dspMchnID" Background="White" FontSize="13" Text="Machine ID"
-                                                             Width="132" Height="30" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
-                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
-                                                             Padding="0,0,0,0" Focusable="False"/>
-                                            <Label Grid.Column="0" Grid.Row="1" FontSize="14" VerticalAlignment="Center"
-                                                           Content="Machine No.:" FontWeight="Normal" VerticalContentAlignment="Center" Height="28" Margin="0,0,12,0"/>
-                                            <TextBox Grid.Column="1" Grid.Row="1" Name="dspEqmntID" Background="White" FontSize="13" Text="Machine no."
-                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
-                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
-                                                             Padding="0,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
-                                            <Label Grid.Column="0" Grid.Row="2" FontSize="14" VerticalAlignment="Center"
-                                                           Content="Assig/Check ID.:" FontWeight="Normal" VerticalContentAlignment="Center" Height="28" Margin="0,0,12,0"/>
-                                            <TextBox Grid.Column="1" Grid.Row="2" Name="dspChckID" Background="White" FontSize="13" Text="Check ID"
-                                                             Width="132" HorizontalAlignment="Center" HorizontalContentAlignment="Right"
-                                                             BorderBrush="Black" VerticalContentAlignment="Center" 
-                                                             Padding="0,0,0,0" Focusable="False" Height="30" VerticalAlignment="Center"/>
-                                        </Grid>
                                     </Grid>
-                                </GroupBox>
-                            </Grid>
-                            <Grid Grid.Row="2" Margin="0,12,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                            </Grid>
-                            <Grid Grid.Row="3">
-                                <TabControl BorderBrush="#FF124981" BorderThickness="2" Height="254" VerticalAlignment="Center" HorizontalAlignment="Center" Width="840">
-                                    <TabItem Header="Common" BorderBrush="#FF124981" BorderThickness="2">
-                                        <TabControl>
-                                            <TabItem Header="Table">
-                                                <Grid x:Name="grdCommonTbl"/>
+                                    <Grid Grid.Row="3">
+                                        <TabControl BorderBrush="#FF124981" BorderThickness="2" Height="254" 
+                                                    VerticalAlignment="Center" HorizontalAlignment="Center" Width="840">
+                                            <TabItem Header="Log" BorderBrush="#FF124981" BorderThickness="2">
+                                                <ScrollViewer VerticalScrollBarVisibility="Auto" >
+                                                    <StackPanel Name="stpDBMsg"></StackPanel>
+                                                </ScrollViewer>
                                             </TabItem>
-                                            <TabItem Header="Master">
-                                                <Grid x:Name="grdCommonMstr"/></TabItem>
+                                            <TabItem Header="Common" BorderBrush="#FF124981" BorderThickness="2">
+                                                <TabControl>
+                                                    <TabItem Header="Table">
+                                                        <Grid>
+                                                            <DataGrid x:Name="grdCommonTbl" ItemsSource="{Binding}" AutoGenerateColumns="True"/>
+                                                        </Grid>
+                                                    </TabItem>
+                                                    <TabItem Header="Master">
+                                                        <Grid>
+                                                            <DataGrid x:Name="grdCommonMstr"/>
+                                                        </Grid>
+                                                    </TabItem>
+                                                </TabControl>
+                                            </TabItem>
+                                            <TabItem Header="Install shield" BorderBrush="#FF124981" BorderThickness="2">
+                                                <TabControl>
+                                                    <TabItem Header="Table">
+                                                        <Grid>
+                                                            <DataGrid x:Name="grdShldTbl" ItemsSource="{Binding}" AutoGenerateColumns="True"/>
+                                                        </Grid>
+                                                    </TabItem>
+                                                    <TabItem Header="Master">
+                                                        <Grid>
+                                                            <DataGrid x:Name="grdShldMstr"/>
+                                                        </Grid>
+                                                    </TabItem>
+                                                </TabControl>
+                                            </TabItem>
+                                            <TabItem Header="Install Nut" BorderBrush="#FF124981" BorderThickness="2">
+                                                <TabControl>
+                                                    <TabItem Header="Table">
+                                                        <Grid>
+                                                            <DataGrid x:Name="grdNutTbl" ItemsSource="{Binding}" AutoGenerateColumns="True"/>
+                                                        </Grid>
+                                                    </TabItem>
+                                                    <TabItem Header="Master">
+                                                        <Grid>
+                                                            <DataGrid x:Name="grdNutMstr"/>
+                                                        </Grid>
+                                                    </TabItem>
+                                                </TabControl>
+                                            </TabItem>
+                                            <TabItem Header="Plunger &amp; Armature Assy" BorderBrush="#FF124981" BorderThickness="2">
+                                                <TabControl>
+                                                    <TabItem Header="Table">
+                                                        <Grid>
+                                                            <DataGrid x:Name="grdPlngrTbl" ItemsSource="{Binding}" AutoGenerateColumns="True"/>
+                                                        </Grid>
+                                                    </TabItem>
+                                                    <TabItem Header="Master">
+                                                        <Grid>
+                                                            <DataGrid x:Name="grdPlngrMstr"/>
+                                                        </Grid>
+                                                    </TabItem>
+                                                </TabControl>
+                                            </TabItem>
+                                            <TabItem Header="Latch Assy" BorderBrush="#FF124981" BorderThickness="2">
+                                                <TabControl>
+                                                    <TabItem Header="Table">
+                                                        <Grid>
+                                                            <DataGrid x:Name="grdLatchTbl" ItemsSource="{Binding}" AutoGenerateColumns="True"/>
+                                                        </Grid>
+                                                    </TabItem>
+                                                    <TabItem Header="Master">
+                                                        <Grid>
+                                                            <DataGrid x:Name="grdLatchMstr"/>
+                                                        </Grid>
+                                                    </TabItem>
+                                                </TabControl>
+                                            </TabItem>
                                         </TabControl>
-                                    </TabItem>
-                                    <TabItem Header="Install shield" BorderBrush="#FF124981" BorderThickness="2">
-                                        <TabControl>
-                                            <TabItem Header="Table">
-                                                <Grid x:Name="grdShldTbl"/>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Monitor" FontSize="12">
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Grid.Column="0" Height="613" VerticalAlignment="Center" HorizontalAlignment="Right" Width="215">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="277*"/>
+                                            <RowDefinition Height="336*"/>
+                                        </Grid.RowDefinitions>
+                                        <GroupBox Grid.Row="0" BorderThickness="2" BorderBrush="#FF124981" Width="200" 
+                                              Background="White" HorizontalAlignment="Center" Margin="0,15,0,10">
+                                            <GroupBox.Header>
+                                                <Label Content="Terminal shield limits" Background="#FF124981" 
+                                                   Foreground="White" FontSize="13"/>
+                                            </GroupBox.Header>
+                                            <Grid>
+                                                <DataGrid x:Name="grdShldLimits" ItemsSource="{Binding}" AutoGenerateColumns="True" IsReadOnly="False"/>
+                                            </Grid>
+                                        </GroupBox>
+                                        <TabControl Grid.Row="1" HorizontalAlignment="Center" Width="205">
+                                            <TabItem Header="Prior OP Check">
+                                                <StackPanel>
+                                                    <Label Content="Check components" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspShldChckComp"
+                                                             Name="dspShldChckComp" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Grid Height="130" Margin="5">
+                                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                            <DataGrid x:Name="grdShldPriorOp" ItemsSource="{Binding}" IsReadOnly="True"/>
+                                                        </ScrollViewer>
+                                                    </Grid>
+                                                    <Label Content="Assing components" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspShldAssingComp"
+                                                             Name="dspShldAssingComp" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="Update device status" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspShldAssingComp"
+                                                             Name="dspShldUpdtDvcSts" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                </StackPanel>
                                             </TabItem>
-                                            <TabItem Header="Master">
-                                                <Grid x:Name="grdShldMstr"/>
+                                            <TabItem Header="Results">
+                                                <Grid>
+                                                    <DataGrid x:Name="grdShldRslt" ItemsSource="{Binding}" IsReadOnly="True"/>
+                                                </Grid>
                                             </TabItem>
                                         </TabControl>
-                                    </TabItem>
-                                    <TabItem Header="Install Nut" BorderBrush="#FF124981" BorderThickness="2">
-                                        <TabControl>
-                                            <TabItem Header="Table">
-                                                <Grid x:Name="grdNutTbl"/>
+                                    </Grid>
+                                    <Grid Grid.Column="1" Height="613" VerticalAlignment="Center" HorizontalAlignment="Right" Width="215">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="277*"/>
+                                            <RowDefinition Height="336*"/>
+                                        </Grid.RowDefinitions>
+                                        <GroupBox Grid.Row="0" BorderThickness="2" BorderBrush="#FF124981" Width="200" 
+                                              Background="White" HorizontalAlignment="Center" Margin="0,15,0,10">
+                                            <GroupBox.Header>
+                                                <Label Content="Nut inserts limits" Background="#FF124981" 
+                                                   Foreground="White" FontSize="13"/>
+                                            </GroupBox.Header>
+                                            <Grid>
+                                                <DataGrid x:Name="grdNutLimits" ItemsSource="{Binding}" AutoGenerateColumns="True" IsReadOnly="False"/>
+                                            </Grid>
+                                        </GroupBox>
+                                        <TabControl Grid.Row="1" HorizontalAlignment="Center" Width="205">
+                                            <TabItem Header="Prior OP Check">
+                                                <StackPanel>
+                                                    <Label Content="Check components" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspNutChckComp"
+                                                             Name="dspNutChckComp" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Grid Height="130" Margin="5">
+                                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                            <DataGrid x:Name="grdNutPriorOp" ItemsSource="{Binding}" IsReadOnly="True"/>
+                                                        </ScrollViewer>
+                                                    </Grid>
+                                                    <Label Content="Assing components" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspNutAssingComp"
+                                                             Name="dspNutAssingComp" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="Update device status" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspNutAssingComp"
+                                                             Name="dspNutUpdtDvcSts" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                </StackPanel>
                                             </TabItem>
-                                            <TabItem Header="Master">
-                                                <Grid x:Name="grdNutMstr"/>
+                                            <TabItem Header="Results">
+                                                <Grid>
+                                                    <DataGrid x:Name="grdNutRslt" ItemsSource="{Binding}" IsReadOnly="True"/>
+                                                </Grid>
                                             </TabItem>
                                         </TabControl>
-                                    </TabItem>
-                                    <TabItem Header="Plunger &amp; Armature Assy" BorderBrush="#FF124981" BorderThickness="2">
-                                        <TabControl>
-                                            <TabItem Header="Table">
-                                                <Grid x:Name="grdPlngrTbl"/>
+                                    </Grid>
+                                    <Grid Grid.Column="2" Height="613" VerticalAlignment="Center" HorizontalAlignment="Right" Width="215">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="277*"/>
+                                            <RowDefinition Height="336*"/>
+                                        </Grid.RowDefinitions>
+                                        <GroupBox Grid.Row="0" BorderThickness="2" BorderBrush="#FF124981" Width="200" 
+                                              Background="White" HorizontalAlignment="Center" Margin="0,15,0,10">
+                                            <GroupBox.Header>
+                                                <Label Content="Plunger &amp; armature limits" Background="#FF124981" 
+                                                   Foreground="White" FontSize="13"/>
+                                            </GroupBox.Header>
+                                            <Grid>
+                                                <DataGrid x:Name="grdPlngrLimits" ItemsSource="{Binding}" AutoGenerateColumns="True" IsReadOnly="False"/>
+                                            </Grid>
+                                        </GroupBox>
+                                        <TabControl Grid.Row="1" HorizontalAlignment="Center" Width="205">
+                                            <TabItem Header="Prior OP Check">
+                                                <StackPanel>
+                                                    <Label Content="Check components" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspPlngrChckComp"
+                                                             Name="dspPlngrChckComp" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Grid Height="130" Margin="5">
+                                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                            <DataGrid x:Name="grdPlngrPriorOp" ItemsSource="{Binding}" IsReadOnly="True"/>
+                                                        </ScrollViewer>
+                                                    </Grid>
+                                                    <Label Content="Assing components" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspPlngrAssingComp"
+                                                             Name="dspPlngrAssingComp" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="Update device status" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspPlngrAssingComp"
+                                                             Name="dspPlngrUpdtDvcSts" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                </StackPanel>
                                             </TabItem>
-                                            <TabItem Header="Master">
-                                                <Grid x:Name="grdPlngrMstr"/>
+                                            <TabItem Header="Results">
+                                                <Grid>
+                                                    <DataGrid x:Name="grdPlngrRslt" ItemsSource="{Binding}" IsReadOnly="True"/>
+                                                </Grid>
                                             </TabItem>
                                         </TabControl>
-                                    </TabItem>
-                                    <TabItem Header="Latch Assy" BorderBrush="#FF124981" BorderThickness="2">
-                                        <TabControl>
-                                            <TabItem Header="Table">
-                                                <Grid x:Name="grdLatchTbl"/>
+                                    </Grid>
+                                    <Grid Grid.Column="3" Height="613" VerticalAlignment="Center" HorizontalAlignment="Right" Width="215">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="277*"/>
+                                            <RowDefinition Height="336*"/>
+                                        </Grid.RowDefinitions>
+                                        <GroupBox Grid.Row="0" BorderThickness="2" BorderBrush="#FF124981" Width="200" 
+                                                  Background="White" HorizontalAlignment="Center" Margin="0,15,0,10">
+                                            <GroupBox.Header>
+                                                <Label Content="Latch limits" Background="#FF124981" 
+                                                   Foreground="White" FontSize="13"/>
+                                            </GroupBox.Header>
+                                            <Grid>
+                                                <DataGrid x:Name="grdLatchLimits" ItemsSource="{Binding}" AutoGenerateColumns="True" IsReadOnly="False"/>
+                                            </Grid>
+                                        </GroupBox>
+                                        <TabControl Grid.Row="1" HorizontalAlignment="Center" Width="205">
+                                            <TabItem Header="Prior OP Check">
+                                                <StackPanel>
+                                                    <Label Content="Check components" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspLatchChckComp"
+                                                             Name="dspLatchChckComp" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Grid Height="130" Margin="5">
+                                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                            <DataGrid x:Name="grdLatchPriorOp" ItemsSource="{Binding}" IsReadOnly="True"/>
+                                                        </ScrollViewer>
+                                                    </Grid>
+                                                    <Label Content="Assing components" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspLatchAssingComp"
+                                                             Name="dspLatchAssingComp" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="Update device status" Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                    <TextBox Grid.Column="1" Grid.Row="0" FontSize="13" Text="dspLatchAssingComp"
+                                                             Name="dspLatchUpdtDvcSts" Background="WhiteSmoke"
+                                                             Width="195" Height="25" HorizontalAlignment="Center"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                </StackPanel>
                                             </TabItem>
-                                            <TabItem Header="Master">
-                                                <Grid x:Name="grdLatchMstr"/>
+                                            <TabItem Header="Results">
+                                                <Grid>
+                                                    <DataGrid x:Name="grdLatchRslt" ItemsSource="{Binding}" IsReadOnly="True"/>
+                                                </Grid>
                                             </TabItem>
                                         </TabControl>
-                                    </TabItem>
-                                </TabControl>
-                            </Grid>
-                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Proceso" Height="40" Width="150" BorderBrush="{x:Null}" FontSize="15">
@@ -329,8 +567,8 @@
                             <TabItem Header="Insert shield" FontSize="12">
                                 <Grid Background="#FFE5E5E5">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="100"/>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="180.00"/>
                                     </Grid.RowDefinitions>
                                     <Grid Grid.Row="0">
                                         <Grid.ColumnDefinitions>
@@ -338,42 +576,78 @@
                                             <ColumnDefinition Width="309*"/>
                                             <ColumnDefinition Width="285*"/>
                                         </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0" HorizontalAlignment="Right" Margin="0,20,0,0" Width="150">
-                                            <Label Content="Distancia 1:" FontWeight="Bold" FontSize="15"/>
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBox Name="dspDistance1Shld" Background="White" FontSize="14" Text="0.00" HorizontalContentAlignment="Right"
-                                                     Width="100" Height="30" HorizontalAlignment="Left"
-                                                     BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
-                                                     VerticalContentAlignment="Center" Focusable="False"/>
-                                                <Label Content="mm" Foreground="Black" FontSize="15"/>
-                                            </StackPanel>
-                                            <Label Content="Fuerza 1:" FontWeight="Bold" FontSize="15"/>
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBox Name="dspForce1Shld" Background="White" Text="0.00" FontSize="15"
+                                        <Grid Grid.Column="0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="224*"/>
+                                                <RowDefinition Height="210*"/>
+                                            </Grid.RowDefinitions>
+                                            <StackPanel Grid.Row="0" HorizontalAlignment="Right" Margin="0,20,0,0" Width="150">
+                                                <Label Content="Distancia 1:" FontWeight="Bold" FontSize="15"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBox Name="dspShldDistance1" Background="White" FontSize="14" Text="0.00" HorizontalContentAlignment="Right"
+                                                             Width="100" Height="30" HorizontalAlignment="Left"
+                                                             BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
+                                                             VerticalContentAlignment="Center" Focusable="False"/>
+                                                    <Label Content="mm" Foreground="Black" FontSize="15"/>
+                                                </StackPanel>
+                                                <Label Content="Fuerza 1:" FontWeight="Bold" FontSize="15"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBox Name="dspShldForce1" Background="White" Text="0.00" FontSize="15"
                                                      Width="100" Height="30" HorizontalAlignment="Left" Focusable="False"
                                                      BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
                                                      VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
-                                                <Label Content="N" FontSize="15"/>
-                                            </StackPanel>
-                                            <Label Content="Juicio:" FontWeight="Bold" FontSize="15"/>
-                                            <TextBox Name="dspJdg1Shield" Background="White" Text="OK/NG" FontSize="15"
+                                                    <Label Content="N" FontSize="15"/>
+                                                </StackPanel>
+                                                <Label Content="Estatus:" FontWeight="Bold" FontSize="15"/>
+                                                <TextBox Name="dspShldJdg1" Background="White" Text="OK/NG" FontSize="15"
                                                      Width="100" Height="30" HorizontalAlignment="Left"
                                                      BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
                                                      VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="511" Width="248">
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="1" Margin="10,0,0,0">
+                                                <Label Content="No. serie actual:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Name="dspShldSerialNo"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="No. serie anterior:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Name="dspShldOldSerial"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="Lot ID:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Text="{Binding ElementName=dspSelectedLotID, Path=Text}"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="Device ID:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Text="{Binding ElementName=dspSelectedDvcID, Path=Text}"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Center" Width="248" Margin="0,1,0,1">
                                             <Label Content="Insert Arc Shield" FontSize="25" Foreground="#FF124981" FontWeight="Bold" HorizontalContentAlignment="Center"/>
-                                            <Image Source="/Captura de pantalla 2023-07-05 a la(s) 20.04.09.png" Height="475" Width="247" />
+                                            <Image Source="/Captura de pantalla 2023-07-05 a la(s) 20.04.09.png" Height="373" Width="196" />
                                         </StackPanel>
                                         <Grid Grid.Column="2">
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="2*"/>
-                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="225*"/>
+                                                <RowDefinition Height="210*"/>
                                             </Grid.RowDefinitions>
-                                            <StackPanel Grid.Row="0" HorizontalAlignment="Left" Margin="0,20,0,0">
+                                            <StackPanel Grid.Row="0" HorizontalAlignment="Left" Margin="0,20,0,0" Width="136">
                                                 <Label Content="Distancia 2:" FontWeight="Bold" FontSize="15"/>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBox Name="dspDistance2Shld" Background="White"
+                                                    <TextBox Name="dspShldDistance2" Background="White"
                                                      Width="100" Height="30" HorizontalAlignment="Left" Text="0.00" FontSize="15"
                                                      BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" Focusable="False"
                                                      VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
@@ -381,28 +655,720 @@
                                                 </StackPanel>
                                                 <Label Content="Fuerza 2:" FontWeight="Bold" FontSize="15"/>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBox Name="dspForce2Shld" Background="White" Text="0.00" FontSize="15"
+                                                    <TextBox Name="dspShldForce2" Background="White" Text="0.00" FontSize="15"
+                                                     Width="100" Height="30" HorizontalAlignment="Left" Focusable="False"
+                                                     BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
+                                                     VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
+                                                    <Label Content="N" FontSize="15"/>
+                                                </StackPanel>
+                                                <Label Content="Estatus:" FontWeight="Bold" FontSize="15"/>
+                                                <TextBox Name="dspShldJdg2" Background="White" Text="OK/NG" FontSize="15"
+                                                     Width="100" Height="30" HorizontalAlignment="Left" Focusable="False"
+                                                     BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
+                                                     VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                                <Label Content="Piezas totales:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ProgressBar x:Name="barShldTotPc" Width="156" Height="25"
+                                                                 BorderBrush="Black" Value="50" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                                    <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                             Name="dspShldTotPc"
+                                                             Background="WhiteSmoke" Width="60" Height="25"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="pieza(s)" Width="49"/>
+                                                </StackPanel>
+                                                <Label Content="Piezas totales Ok:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ProgressBar x:Name="barShldTotOkPc" 
+                                                                 Width="156" Height="25" BorderBrush="Black" Value="10" Foreground="#FF12B104"
+                                                                 Maximum="{Binding ElementName=barShldTotPc, Path=Value}"/>
+                                                    <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                             Name="dspShldTotOkPc"
+                                                             Background="WhiteSmoke" Width="60" Height="25"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="pieza(s)" Width="49"/>
+                                                </StackPanel>
+                                                <Label Content="Piezas totales Ng:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ProgressBar Name="barShldTotNgPc" 
+                                                                 Width="156" Height="25" BorderBrush="Black" Value="35" Foreground="#FFB11104"
+                                                                 Maximum="{Binding ElementName=barShldTotPc, Path=Value}"/>
+                                                    <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                             Name="dspShldTotNgPc"
+                                                             Background="WhiteSmoke" Width="60" Height="25"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="pieza(s)" Width="49"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Grid>
+                                    <TabControl Grid.Row="1" BorderBrush="#FF124981" BorderThickness="2" Height="160" 
+                                                VerticalAlignment="Center" HorizontalAlignment="Center" Width="840">
+                                        <TabItem Header="Log" BorderBrush="#FF124981" BorderThickness="2">
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto" >
+                                                <StackPanel Name="stpShieldMsg"></StackPanel>
+                                            </ScrollViewer>
+                                        </TabItem>
+                                        <TabItem Header="Info. Producción" BorderBrush="#FF124981" BorderThickness="2">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0" Margin="5,0,5,0">
+                                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                                        <Label Content="Piezas totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="22,0,10,0"
+                                                                 Text="{Binding ElementName=dspShldTotPc, Path=Text}"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Width="197" Height="15" BorderBrush="Black" 
+                                                                 Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
+                                                                 Maximum="{Binding ElementName=barShldTotPc, Path=Maximum}"
+                                                                 Value="{Binding ElementName=barShldTotPc, Path=Value}"/>
+                                                    <StackPanel Orientation="Horizontal" Margin="3">
+                                                        <Label Content="Piezas Ok totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                                 Text="{Binding ElementName=dspShldTotOkPc, Path=Text}"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Width="197" Height="15" BorderBrush="Black" Foreground="#FF12B104"
+                                                                 Maximum="{Binding ElementName=barShldTotOkPc, Path=Maximum}"
+                                                                 Value="{Binding ElementName=barShldTotOkPc, Path=Value}"/>
+                                                    <StackPanel Orientation="Horizontal" Margin="3">
+                                                        <Label Content="Piezas Ng totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                                 Text="{Binding ElementName=dspShldTotNgPc, Path=Text}"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Width="197" Height="15" BorderBrush="Black" Foreground="#FFB11104"
+                                                                 Maximum="{Binding ElementName=barShldTotNgPc, Path=Maximum}"
+                                                                 Value="{Binding ElementName=barShldTotNgPc, Path=Value}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="5">
+                                                    <StackPanel Orientation="Horizontal" Margin="3">
+                                                        <Label Content="Shield L Ok totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                                 Name="dspShldLTotOkPc"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Right"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Name="barShldLTotOk" 
+                                                                 Width="197" Height="15" BorderBrush="Black" Value="5" Foreground="#FF12B104"
+                                                                 Maximum="{Binding ElementName=barShldTotPc, Path=Value}"/>
+                                                    <StackPanel Orientation="Horizontal" Margin="3">
+                                                        <Label Content="Shield L Ng totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                                 Name="dspShldLTotNgPc"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Name="barShldLTotNg" Width="197" Height="15" BorderBrush="Black" Foreground="#FFB11104"
+                                                                 Value="10" 
+                                                                 Maximum="{Binding ElementName=barShldTotPc, Path=Value}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="5">
+                                                    <StackPanel Orientation="Horizontal" Margin="3">
+                                                        <Label Content="Shield R Ok totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                                 Name="dspShldRTotOkPc"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Name="barShldRTotOk" Width="197" Height="15" BorderBrush="Black" Value="50" Foreground="#FF12B104"
+                                                                 Maximum="{Binding ElementName=barShldTotPc, Path=Value}"/>
+                                                    <StackPanel Orientation="Horizontal" Margin="3">
+                                                        <Label Content="Shield L Ng totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                                 Name="dspShldRTotNgPc"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Name="barShldRTotNg" Width="197" Height="15" BorderBrush="Black" Value="40" Foreground="#FFB11104"
+                                                                 Maximum="{Binding ElementName=barShldTotPc, Path=Value}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </TabItem>
+                                        <TabItem Header="Límites" BorderBrush="#FF124981" BorderThickness="2">
+                                            <DataGrid ItemsSource="{Binding ElementName=grdShldLimits, Path=ItemsSource}" IsReadOnly="True"/>
+                                        </TabItem>
+                                        <TabItem Header="Resultados" BorderBrush="#FF124981" BorderThickness="2">
+                                            <Grid>
+                                                <DataGrid ItemsSource="{Binding ElementName=grdShldRslt, Path=ItemsSource}" IsReadOnly="True"/>
+                                            </Grid>
+                                        </TabItem>
+                                    </TabControl>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Insert left nut" FontSize="12">
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="180.00"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="218*"/>
+                                            <ColumnDefinition Width="363*"/>
+                                            <ColumnDefinition Width="218*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="224*"/>
+                                                <RowDefinition Height="210*"/>
+                                            </Grid.RowDefinitions>
+                                            <StackPanel Grid.Row="0" HorizontalAlignment="Right" Margin="0,20,0,0" Width="150">
+                                                <Label Content="Distancia:" FontWeight="Bold" FontSize="15"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBox Name="dspNutLDistance" Background="White" FontSize="14" Text="0.00" HorizontalContentAlignment="Right"
+                                                             Width="100" Height="30" HorizontalAlignment="Left"
+                                                             BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
+                                                             VerticalContentAlignment="Center" Focusable="False"/>
+                                                    <Label Content="mm" Foreground="Black" FontSize="15"/>
+                                                </StackPanel>
+                                                <Label Content="Fuerza:" FontWeight="Bold" FontSize="15"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBox Name="dspNutLForce" Background="White" Text="0.00" FontSize="15"
                                                      Width="100" Height="30" HorizontalAlignment="Left" Focusable="False"
                                                      BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
                                                      VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
                                                     <Label Content="N" FontSize="15"/>
                                                 </StackPanel>
                                                 <Label Content="Juicio:" FontWeight="Bold" FontSize="15"/>
-                                                <TextBox Name="dspJdg2Shield" Background="White" Text="OK/NG" FontSize="15"
-                                                     Width="100" Height="30" HorizontalAlignment="Left" Focusable="False"
+                                                <TextBox Name="dspNutLJdg" Background="White" Text="OK/NG" FontSize="15"
+                                                     Width="100" Height="30" HorizontalAlignment="Left"
                                                      BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
                                                      VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                                             </StackPanel>
-                                            <Label Grid.Row="1" Content="Insertar Ok,Ng, total"/>
+                                            <StackPanel Grid.Row="1" Margin="10,0,0,0">
+                                                <Label Content="No. serie actual:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Name="dspNutLSerialNo"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="No. serie anterior:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Name="dspNutLOldSerial"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="Lot ID:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Text="{Binding ElementName=dspSelectedLotID, Path=Text}"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="Device ID:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Text="{Binding ElementName=dspSelectedDvcID, Path=Text}"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Center" Width="371" Margin="0,1,0,1">
+                                            <Label Content="Insert Left Nut" FontSize="25" Foreground="#FF124981" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                                            <Image Source="/NutLeft.png" Height="404" Width="326" />
+                                        </StackPanel>
+                                        <Grid Grid.Column="2">
+                                            <StackPanel VerticalAlignment="Center">
+                                                <Label Content="Piezas totales:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ProgressBar Width="130" Height="25" BorderBrush="Black" Value="50" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
+                                                                 Name="barNutLTotPc"/>
+                                                    <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                             Name="dspNutLTotPc"
+                                                             Background="WhiteSmoke" Width="60" Height="25"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="pz" Width="25"/>
+                                                </StackPanel>
+                                                <Label Content="Piezas totales Ok:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ProgressBar Width="130" Height="25" BorderBrush="Black" Value="10" Foreground="#FF12B104"
+                                                                 Name="barNutLTotOk"
+                                                                 Maximum="{Binding ElementName=barNutLTotPc, Path=Value}"/>
+                                                    <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                             Name="dspNutLTotOk"
+                                                             Background="WhiteSmoke" Width="60" Height="25"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="pz" Width="25"/>
+                                                </StackPanel>
+                                                <Label Content="Piezas totales Ng:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ProgressBar Width="130" Height="25" BorderBrush="Black" Value="40" Foreground="#FFB11104"
+                                                                 Name="barNutLTotNg"
+                                                                 Maximum="{Binding ElementName=barNutLTotPc, Path=Value}"/>
+                                                    <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                             Name="dspNutLTotNg"
+                                                             Background="WhiteSmoke" Width="60" Height="25"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="pz" Width="25"/>
+                                                </StackPanel>
+                                            </StackPanel>
                                         </Grid>
                                     </Grid>
+                                    <TabControl Grid.Row="1" BorderBrush="#FF124981" BorderThickness="2" Height="160" 
+                                                VerticalAlignment="Center" HorizontalAlignment="Center" Width="840">
+                                        <TabItem Header="Log" BorderBrush="#FF124981" BorderThickness="2">
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto" >
+                                                <StackPanel Name="stpNutLMsg"></StackPanel>
+                                            </ScrollViewer>
+                                        </TabItem>
+
+                                        <TabItem Header="Info. Producción" BorderBrush="#FF124981" BorderThickness="2">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0" Margin="5,0,5,0">
+                                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                                        <Label Content="Piezas totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="22,0,10,0"
+                                                                 Text="{Binding ElementName=dspNutLTotPc, Path=Text}"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Width="197" Height="15" BorderBrush="Black"
+                                                                 Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
+                                                                 Maximum="{Binding ElementName=barNutLTotPc, Path=Maximum}"
+                                                                 Value="{Binding ElementName=barNutLTotPc, Path=Value}"/>
+                                                    <StackPanel Orientation="Horizontal" Margin="3">
+                                                        <Label Content="Piezas Ok totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                                 Text="{Binding ElementName=dspNutLTotOk, Path=Text}"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Width="197" Height="15" BorderBrush="Black" Foreground="#FF12B104"
+                                                                 Maximum="{Binding ElementName=barNutLTotOk, Path=Maximum}"
+                                                                 Value="{Binding ElementName=barNutLTotOk, Path=Value}"/>
+                                                    <StackPanel Orientation="Horizontal" Margin="3">
+                                                        <Label Content="Piezas Ng totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                                 Text="{Binding ElementName=dspNutLTotNg, Path=Text}"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Width="197" Height="15" BorderBrush="Black" Foreground="#FFB11104"
+                                                                 Maximum="{Binding ElementName=barNutLTotNg, Path=Maximum}"
+                                                                 Value="{Binding ElementName=barNutLTotNg, Path=Value}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="5">
+                                                    <Label Content="space1"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="5">
+                                                    <Label Content="space2"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </TabItem>
+                                        <TabItem Header="Límites" BorderBrush="#FF124981" BorderThickness="2">
+                                            <Grid>
+                                                <DataGrid ItemsSource="{Binding ElementName=grdNutLimits, Path=ItemsSource}" IsReadOnly="true"/>
+                                            </Grid>
+                                        </TabItem>
+                                        <TabItem Header="Resultados" BorderBrush="#FF124981" BorderThickness="2">
+                                            <Grid>
+                                                <DataGrid ItemsSource="{Binding ElementName=grdNutRslt, Path=ItemsSource}" IsReadOnly="true"/>
+                                            </Grid>
+                                        </TabItem>
+                                    </TabControl>
                                 </Grid>
                             </TabItem>
-                            <TabItem Header="Insert Plug" FontSize="12">
-                                <Grid Background="#FFE5E5E5"/>
+                            <TabItem Header="Insert right nut" FontSize="12">
+
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="180.00"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="218*"/>
+                                            <ColumnDefinition Width="363*"/>
+                                            <ColumnDefinition Width="218*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="224*"/>
+                                                <RowDefinition Height="210*"/>
+                                            </Grid.RowDefinitions>
+                                            <StackPanel Grid.Row="0" HorizontalAlignment="Right" Margin="0,20,0,0" Width="150">
+                                                <Label Content="Distancia:" FontWeight="Bold" FontSize="15"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBox Name="dspNutRDistance" Background="White" FontSize="14" Text="0.00" HorizontalContentAlignment="Right"
+                                                             Width="100" Height="30" HorizontalAlignment="Left"
+                                                             BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
+                                                             VerticalContentAlignment="Center" Focusable="False"/>
+                                                    <Label Content="mm" Foreground="Black" FontSize="15"/>
+                                                </StackPanel>
+                                                <Label Content="Fuerza:" FontWeight="Bold" FontSize="15"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBox Name="dspNutRForce" Background="White" Text="0.00" FontSize="15"
+                                                     Width="100" Height="30" HorizontalAlignment="Left" Focusable="False"
+                                                     BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
+                                                     VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
+                                                    <Label Content="N" FontSize="15"/>
+                                                </StackPanel>
+                                                <Label Content="Juicio:" FontWeight="Bold" FontSize="15"/>
+                                                <TextBox Name="dspNutRJdg" Background="White" Text="OK/NG" FontSize="15"
+                                                     Width="100" Height="30" HorizontalAlignment="Left"
+                                                     BorderBrush="Black" Margin="0,2,0,2" IsEnabled="True" 
+                                                     VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="1" Margin="10,0,0,0">
+                                                <Label Content="No. serie actual:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Name="dspNutRSerialNo"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="No. serie anterior:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Name="dspNutROldSerial"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="Lot ID:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Text="{Binding ElementName=dspSelectedLotID, Path=Text}"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="Device ID:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Text="{Binding ElementName=dspSelectedDvcID, Path=Text}"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Center" Width="371" Margin="0,1,0,1">
+                                            <Label Content="Insert Right Nut" FontSize="25" Foreground="#FF124981" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                                            <Image Source="/NutRight.png" Height="404" Width="326" />
+                                        </StackPanel>
+                                        <Grid Grid.Column="2">
+                                            <StackPanel VerticalAlignment="Center">
+                                                <Label Content="Piezas totales:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ProgressBar Width="130" Height="25" BorderBrush="Black" Value="50" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
+                                                                 Name="barNutRTotPc"/>
+                                                    <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                             Name="dspNutRTotPc"
+                                                             Background="WhiteSmoke" Width="60" Height="25"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="pz" Width="25"/>
+                                                </StackPanel>
+                                                <Label Content="Piezas totales Ok:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ProgressBar Width="130" Height="25" BorderBrush="Black" Value="35" Foreground="#FF12B104"
+                                                                 Name="barNutRTotOk"
+                                                                 Maximum="{Binding ElementName=barNutRTotPc, Path=Value}"/>
+                                                    <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                             Name="dspNutRTotOk"
+                                                             Background="WhiteSmoke" Width="60" Height="25"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="pz" Width="25"/>
+                                                </StackPanel>
+                                                <Label Content="Piezas totales Ng:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ProgressBar Width="130" Height="25" BorderBrush="Black" Value="15" Foreground="#FFB11104"
+                                                                 Name="barNutRTotNg"
+                                                                 Maximum="{Binding ElementName=barNutRTotPc, Path=Value}"/>
+                                                    <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                             Name="dspNutRTotNg"
+                                                             Background="WhiteSmoke" Width="60" Height="25"
+                                                             BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                             VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                    <Label Content="pz" Width="25"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Grid>
+                                    <TabControl Grid.Row="1" BorderBrush="#FF124981" BorderThickness="2" Height="160" 
+                                                VerticalAlignment="Center" HorizontalAlignment="Center" Width="840">
+                                        <TabItem Header="Log" BorderBrush="#FF124981" BorderThickness="2">
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto" >
+                                                <StackPanel DataContext="{Binding ElementName=stpNutLMsg, Path=DataContext}"></StackPanel>
+                                            </ScrollViewer>
+                                        </TabItem>
+                                        <TabItem Header="Info. Producción" BorderBrush="#FF124981" BorderThickness="2">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0" Margin="5,0,5,0">
+                                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                                        <Label Content="Piezas totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="22,0,10,0"
+                                                                 Text="{Binding ElementName=dspNutRTotPc, Path=Text}"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Width="197" Height="15" BorderBrush="Black" 
+                                                                 Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
+                                                                 Maximum="{Binding ElementName=barNutRTotPc, Path=Maximum}"
+                                                                 Value="{Binding ElementName=barNutRTotPc, Path=Value}"/>
+                                                    <StackPanel Orientation="Horizontal" Margin="3">
+                                                        <Label Content="Piezas Ok totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                                 Text="{Binding ElementName=dspNutRTotOk, Path=Text}"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Width="197" Height="15" BorderBrush="Black" Foreground="#FF12B104"
+                                                                 Maximum="{Binding ElementName=barNutRTotOk, Path=Maximum}"
+                                                                 Value="{Binding ElementName=barNutRTotOk, Path=Value}"/>
+                                                    <StackPanel Orientation="Horizontal" Margin="3">
+                                                        <Label Content="Piezas Ng totales:" FontSize="12" FontWeight="Normal" Foreground="#FF124981"
+                                                               Height="17" Padding="0" VerticalContentAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" FontSize="13" Margin="5,0"
+                                                                 Text="{Binding ElementName=dspNutRTotNg, Path=Text}"
+                                                                 Background="WhiteSmoke" Width="60" Height="20"
+                                                                 BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                                 VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                        <Label Content="pz" Padding="0" Width="19" Height="20"
+                                                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ProgressBar Width="197" Height="15" BorderBrush="Black" Value="50" Foreground="#FFB11104"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="5">
+                                                    <Label Content="space1"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="5">
+                                                    <Label Content="space2"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </TabItem>
+                                        <TabItem Header="Límites" BorderBrush="#FF124981" BorderThickness="2">
+                                            <Grid>
+                                                <DataGrid ItemsSource="{Binding ElementName=grdNutLimits, Path=ItemsSource}" IsReadOnly="true"/>
+                                            </Grid>
+                                        </TabItem>
+                                        <TabItem Header="Resultados" BorderBrush="#FF124981" BorderThickness="2">
+                                            <Grid>
+                                                <DataGrid ItemsSource="{Binding ElementName=grdNutRslt, Path=ItemsSource}" IsReadOnly="true"/>
+                                            </Grid>
+                                        </TabItem>
+                                    </TabControl>
+                                </Grid>
                             </TabItem>
-                            <TabItem Header="Insert M8" FontSize="12">
-                                <Grid Background="#FFE5E5E5"/>
+                            <TabItem Header="Plunger &amp; latch assy" FontSize="12">
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Label Content="Plunger &amp; armature assy monitor." FontSize="18" Padding="0"
+                                               Foreground="#FF124981" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="4*"/>
+                                                <ColumnDefinition Width="11*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Margin="10,0,0,0">
+                                                <Label Content="No. serie actual:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Name="dspPlngArmSerialNo"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="No. serie anterior:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Name="dspPlngArmOldSerial"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1">
+                                                <Label Content="Lot ID:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Text="{Binding ElementName=dspSelectedLotID, Path=Text}"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="Device ID:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Text="{Binding ElementName=dspSelectedDvcID, Path=Text}"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <TabControl BorderBrush="#FF124981" BorderThickness="2" Height="160" Margin="5"
+                                                    VerticalAlignment="Center" HorizontalAlignment="Center" Width="840">
+                                            <TabItem Header="Log" BorderBrush="#FF124981" BorderThickness="2">
+                                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                    <StackPanel Name="stpPlngArmMsg"></StackPanel>
+                                                </ScrollViewer>
+                                            </TabItem>
+                                            <TabItem Header="Límites" BorderBrush="#FF124981" BorderThickness="2">
+                                                <Grid>
+                                                    <DataGrid ItemsSource="{Binding ElementName=grdPlngrLimits, Path=ItemsSource}" IsReadOnly="True"/>
+                                                </Grid>
+                                            </TabItem>
+                                            <TabItem Header="Resultados" BorderBrush="#FF124981" BorderThickness="2">
+                                                <Grid>
+                                                    <DataGrid ItemsSource="{Binding ElementName=grdPlngrRslt, Path=ItemsSource}" IsReadOnly="True"/>
+                                                </Grid>
+                                            </TabItem>
+                                        </TabControl>
+
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Label Content="Latch assy monitor." FontSize="18" Padding="0"
+                                               Foreground="#FF124981" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="4*"/>
+                                                <ColumnDefinition Width="11*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Margin="10,0,0,0">
+                                                <Label Content="No. serie actual:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox FontSize="13"
+                                                         Name="dspLatchSerialNo"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="No. serie anterior:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Name="dspLatchOldSerial"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1">
+                                                <Label Content="Lot ID:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Text="{Binding ElementName=dspSelectedLotID, Path=Text}"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                                <Label Content="Device ID:" FontSize="14" FontWeight="Bold" Foreground="#FF124981"
+                                                       Height="25" Padding="0" VerticalContentAlignment="Center"/>
+                                                <TextBox Grid.Column="1" FontSize="13"
+                                                         Text="{Binding ElementName=dspSelectedDvcID, Path=Text}"
+                                                         Background="WhiteSmoke" Width="195" Height="25" HorizontalAlignment="Left"
+                                                         BorderBrush="Black" IsEnabled="True" Focusable="False"
+                                                         VerticalContentAlignment="center" HorizontalContentAlignment="Left"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <TabControl BorderBrush="#FF124981" BorderThickness="2" Height="160" Margin="5"
+                                                    VerticalAlignment="Center" HorizontalAlignment="Center" Width="840">
+                                            <TabItem Header="Log" BorderBrush="#FF124981" BorderThickness="2">
+                                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                    <StackPanel Name="stpLatchMsg"></StackPanel>
+                                                </ScrollViewer>
+                                            </TabItem>
+                                            <TabItem Header="Límites" BorderBrush="#FF124981" BorderThickness="2">
+                                                <Grid>
+                                                    <DataGrid ItemsSource="{Binding ElementName=grdLatchLimits, Path=ItemsSource}" IsReadOnly="True"/>
+                                                </Grid>
+                                            </TabItem>
+                                            <TabItem Header="Resultados" BorderBrush="#FF124981" BorderThickness="2">
+                                                <Grid>
+                                                    <DataGrid ItemsSource="{Binding ElementName=grdLatchRslt, Path=ItemsSource}" IsReadOnly="True"/>
+                                                </Grid>
+                                            </TabItem>
+                                        </TabControl>
+
+                                    </StackPanel>
+                                </Grid>
                             </TabItem>
                             <TabItem Header="Alarmas" FontSize="12">
                                 <Grid Background="#FFE5E5E5">
@@ -3016,12 +3982,21 @@
             </TabControl>
 
         </Grid>
-        <Grid Grid.Row="1" Margin="0,647,0,0" Grid.RowSpan="2">
-            <Button Name="btnReset" Content="Reset" 
-                    FontSize="15" Margin="25,0,0,5" 
+        <Grid Grid.Row="1" Grid.RowSpan="2" Height="50" VerticalAlignment="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Name="btnReset" Content="Reset" 
+                    FontSize="15" Margin="25,5,0,5" 
                     HorizontalAlignment="Left" 
-                    Width="100" Height="40" VerticalAlignment="Bottom" 
-                    BorderThickness="2" BorderBrush="#FF19C0D4" Background="#FFDDDDDD" PreviewMouseLeftButtonDown="BtnResetPress" PreviewMouseLeftButtonUp="BtnResetRelease"/>
+                    Width="100" 
+                    BorderThickness="2" BorderBrush="Firebrick" Background="#FFDDDDDD" PreviewMouseLeftButtonDown="BtnResetPress" PreviewMouseLeftButtonUp="BtnResetRelease"/>
+            <Button Grid.Column="1" Content="Mark info." Width="100" Height="40" Click="BtnShwMrkInfo"/>
         </Grid>
         <Grid Grid.Row="2" Grid.ColumnSpan="2" Margin="0,50,0,0" Grid.RowSpan="2">
             <StatusBar Background="#FF124981">

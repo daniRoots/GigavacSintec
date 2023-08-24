@@ -147,10 +147,10 @@ namespace SensataSoftware_DEMO
     enum eInstallTermShld_Prod_Limits
     {
         DeviceID,
-        ThresholdX_Max,
-        ThresholdX_Min,
-        ThresholdY_Max,
-        ThresholdY_Min,
+        MaxDistance,
+        MinDistance,
+        MaxForce,
+        MinForce,
         Settings
     }
     enum eInstallTermShld_Prod_Results
@@ -175,10 +175,10 @@ namespace SensataSoftware_DEMO
     enum eInstallM8Insr_Prod_Results
     {
         PartStatus,
-        ThresholdX_Max,
-        ThresholdX_Min,
-        ThresholdY_Max,
-        ThresholdY_Min,
+        Force_Left,
+        Distance_Left,
+        Force_Right,
+        Distance_Right,
     }
     //Plunger & Armature Assy
     enum ePlugrArmAssy_Prod_Limits

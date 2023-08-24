@@ -1432,10 +1432,10 @@ namespace SensataSoftware_DEMO
                                 //oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.Displacement_Min]   = rowList[1][1];
                                 //oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.Force_Max]          = rowList[2][1];
                                 //oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.Force_Min]          = rowList[3][1];
-                                oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.ThresholdX_Max]     = rowList[0][1];
-                                oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.ThresholdX_Min]     = rowList[1][1];
-                                oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.ThresholdY_Max]     = rowList[2][1];
-                                oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.ThresholdY_Min]     = rowList[3][1];
+                                oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MaxDistance]     = rowList[0][1];
+                                oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MinDistance]     = rowList[1][1];
+                                oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MaxForce]     = rowList[2][1];
+                                oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MinForce]     = rowList[3][1];
                                 //A16955-CP, DOGMA, Setting from DB
                                 //oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.Settings] = rowList[8][1];
                                 oInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.Settings] = "65535";

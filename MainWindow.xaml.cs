@@ -17,6 +17,12 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections;
 using System.Net.NetworkInformation;
+using SensataSoftware_DEMO;
+using System.Data;
+using System.IO;
+using static Opc.Ua.Utils;
+using System.Windows.Media.Animation;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace GigavacFuseApp
 {
@@ -28,9 +34,10 @@ namespace GigavacFuseApp
         public MainWindow()
         {
             InitializeComponent();
-
+            btnNewLot.IsEnabled = true;
+            btnEndLot.IsEnabled = false;
             //this.WindowState = WindowState.Maximized;
-
+            #region Color init
             whiteGradient.Color = Color.FromArgb(255, 255, 255, 255);
             whiteGradient.Offset = 0.50;
             greenTopGradient.Color = Color.FromArgb(255, 30, 150, 0);
@@ -57,25 +64,355 @@ namespace GigavacFuseApp
             brushGray.GradientStops.Add(grayTopGradient);
             brushGray.GradientStops.Add(whiteGradient);
             brushGray.GradientStops.Add(grayBottomGradient);
+            #endregion
 
-            //resultsValues = new DataValueCollection();
+            resultsValues = new DataValueCollection();
+            oSQLServer = new SQLDatabase();
 
-            cancellGetDateTask = new CancellationTokenSource();
-            _ctGetDateTask = cancellGetDateTask.Token;
+            cancelGetDateTask = new CancellationTokenSource();
+            _ctGetDateTask = cancelGetDateTask.Token;
             getTimeTask = Task.Run(new Action(() => { GetDate(_ctGetDateTask); }));
 
-            cancellGetStatusTask = new CancellationTokenSource();
-            _ctGetStatusTask = cancellGetStatusTask.Token;
+            cancelGetStatusTask = new CancellationTokenSource();
+            _ctGetStatusTask = cancelGetStatusTask.Token;
             opcUaGetStatusTask = Task.Run(/*new Action(*/() => { GetOpcUAState(_ctGetStatusTask); }/*)*/);
+
+            ReadMachineConfigFile();
+
+            #region Machine Labels
+            dspServer.Text = cSVfile[(int)CSV_MachConfig.SQLServerName];
+            dspDatabase.Text = cSVfile[(int)CSV_MachConfig.SQLDBName];
+            dspMchnNo.Text = cSVfile[(int)CSV_MachConfig.MachineNumber];
+            dspMchnName.Text = cSVfile[(int)CSV_MachConfig.MachineName];
+            dspEqmntID.Text = cSVfile[(int)CSV_MachConfig.EquipmentID];
+            dspMchnID.Text = cSVfile[(int)CSV_MachConfig.StationID];
+            dspChckID.Text = cSVfile[(int)CSV_MachConfig.AssignChkCompID];
+            #endregion
+
+            #region SQL Database settings
+
+            #region Machine
+            //Station name
+            oSQLServer.Station = cSVfile[(int)CSV_MachConfig.StationName];
+            //Station ID
+            oSQLServer.StationID = Convert.ToInt64(cSVfile[(int)CSV_MachConfig.StationID]);
+            //Equipment ID
+            oSQLServer.EquipmentID = Convert.ToInt64(cSVfile[(int)CSV_MachConfig.EquipmentID]);
+            //Server name
+            oSQLServer.Server = cSVfile[(int)CSV_MachConfig.SQLServerName];
+            //Database name
+            oSQLServer.DataBase = cSVfile[(int)CSV_MachConfig.SQLDBName];
+            //User
+            oSQLServer.SQLServerUser = cSVfile[(int)CSV_MachConfig.SQLUser];
+            //App Role User
+            oSQLServer.SQLqueryUser = cSVfile[(int)CSV_MachConfig.AppRoleUser];
+            //Device ID table 
+            oSQLServer.TblDeviceIDs = cSVfile[(int)CSV_MachConfig.DeviceIDTable];
+            //Device Family 
+            oSQLServer.DeviceFamily = cSVfile[(int)CSV_MachConfig.DeviceFamily];
+            //Assign & Check Component ID
+            oSQLServer.AssignChkCmpID = cSVfile[(int)CSV_MachConfig.AssignChkCompID];
+
+            #region Common
+            //Prior Op Check table
+            oSQLServer.TblPriorOpCheck = cSVfile[(int)CSV_MachConfig.PriorOpCheck];
+            //Update Device Status table
+            oSQLServer.TblUpdateDeviceStatus = cSVfile[(int)CSV_MachConfig.UpdateDeviceStatus];
+            //Check Components
+            oSQLServer.TblCheckComponents = cSVfile[(int)CSV_MachConfig.CheckComponents];
+            //Assign Component to Serial ID
+            oSQLServer.TblAssignComponentsToSerial = cSVfile[(int)CSV_MachConfig.AssignComponents];
+            //Check Components
+            oSQLServer.TblScanComponents = cSVfile[(int)CSV_MachConfig.ScanComponent];
+            //Assign Component to Serial ID
+            oSQLServer.TblRequiredComponents = cSVfile[(int)CSV_MachConfig.RequiredComponents];
+            #endregion
+
+            #region Components Traceability
+            //Station name
+            oSQLServer.OScanCompQueries.Station = cSVfile[(int)CSV_MachConfig.ScanCompStationName];
+            //Station ID
+            oSQLServer.OScanCompQueries.StationID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.ScanCompStationID]);
+            //Equipment ID
+            oSQLServer.OScanCompQueries.EquipmentID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.ScanCompEquipmentID]);
+            #endregion
+
+            #region Install Terminal Shields
+            //Station name
+            oSQLServer.OInstallTermShldQueries.Station = cSVfile[(int)CSV_MachConfig.InstallTermShldStationName];
+            //Station ID
+            oSQLServer.OInstallTermShldQueries.StationID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallTermShldStationID]);
+            //Equipment ID
+            oSQLServer.OInstallTermShldQueries.EquipmentID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallTermShldEquipmentID]);
+            //Limits table
+            oSQLServer.OInstallTermShldQueries.TblLimits = cSVfile[(int)CSV_MachConfig.LimitsOperParams];
+            //Heating Results History
+            oSQLServer.OInstallTermShldQueries.TblResultsHistory = cSVfile[(int)CSV_MachConfig.InstallTermShldHistory];
+            //Press Inner Can Master Parts Sequence View
+            oSQLServer.TblMastersPartsSeqView = cSVfile[(int)CSV_MachConfig.MasterSequenceView];
+            //Master Samples Quantity
+            oSQLServer.OInstallTermShldLimits.MasterSampleQty = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallTermShldMasterSamples]);
+            #endregion
+
+            #region Install M8 Inserts
+            //Station name
+            oSQLServer.OInstallM8InsrQueries.Station = cSVfile[(int)CSV_MachConfig.InstallM8InsrStationName];
+            //Station ID
+            oSQLServer.OInstallM8InsrQueries.StationID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallM8InsrStationID]);
+            //Equipment ID
+            oSQLServer.OInstallM8InsrQueries.EquipmentID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallM8InsrEquipmentID]);
+            //Limits table
+            oSQLServer.OInstallM8InsrQueries.TblLimits = cSVfile[(int)CSV_MachConfig.LimitsOperParams];
+            //Press Inner Can Results History
+            oSQLServer.OInstallM8InsrQueries.TblResultsHistory = cSVfile[(int)CSV_MachConfig.InstallM8InsrResultsHistory];
+            //Press Inner Can Master Parts Sequence View
+            oSQLServer.TblMastersPartsSeqView = cSVfile[(int)CSV_MachConfig.MasterSequenceView];
+            //Master Samples Quantity
+            oSQLServer.OInstallM8InsrLimits.MasterSampleQty = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallM8InsrMasterSamples]);
+            #endregion
+
+            #region Plunger & Armature Assy
+            //Station name
+            oSQLServer.OPlugrArmAssyQueries.Station = cSVfile[(int)CSV_MachConfig.PlugrArmAssyStationName];
+            //Station ID
+            oSQLServer.OPlugrArmAssyQueries.StationID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.PlugrArmAssyStationID]);
+            //Equipment ID
+            oSQLServer.OPlugrArmAssyQueries.EquipmentID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.PlugrArmAssyEquipmentID]);
+            //Limits table
+            oSQLServer.OPlugrArmAssyQueries.TblLimits = cSVfile[(int)CSV_MachConfig.LimitsOperParams];
+            //Gross Leak Test Results History
+            oSQLServer.OPlugrArmAssyQueries.TblResultsHistory = cSVfile[(int)CSV_MachConfig.PlugrArmAssyResultsHistory];
+            //Gross Leak Test Master Parts Sequence View
+            oSQLServer.TblMastersPartsSeqView = cSVfile[(int)CSV_MachConfig.MasterSequenceView];
+            //Master Samples Quantity
+            oSQLServer.OPlugrArmAssyLimits.MasterSampleQty = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.PlugrArmAssyMasterSamples]);
+            #endregion
+
+            #region Latch Assy
+            //Station name
+            oSQLServer.OLatchAssyQueries.Station = cSVfile[(int)CSV_MachConfig.LatchAssyStationName];
+            //Station ID
+            oSQLServer.OLatchAssyQueries.StationID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.LatchAssyStationID]);
+            //Equipment ID
+            oSQLServer.OLatchAssyQueries.EquipmentID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.LatchAssyEquipmentID]);
+            //Limits table
+            oSQLServer.OLatchAssyQueries.TblLimits = cSVfile[(int)CSV_MachConfig.LimitsOperParams];
+            //Gross Leak Test Results History
+            oSQLServer.OLatchAssyQueries.TblResultsHistory = cSVfile[(int)CSV_MachConfig.LatchAssyResultsHistory];
+            //Gross Leak Test Master Parts Sequence View
+            oSQLServer.TblMastersPartsSeqView = cSVfile[(int)CSV_MachConfig.MasterSequenceView];
+            //Master Samples Quantity
+            oSQLServer.OLatchAssyLimits.MasterSampleQty = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.LatchAssyMasterSamples]);
+            #endregion
+
+            #endregion
+
+            #region Components Traceability
+            //Station name
+            oSQLServer.OScanCompQueries.Station = cSVfile[(int)CSV_MachConfig.ScanCompStationName];
+            //Station ID
+            oSQLServer.OScanCompQueries.StationID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.ScanCompStationID]);
+            //Equipment ID
+            oSQLServer.OScanCompQueries.EquipmentID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.ScanCompEquipmentID]);
+            #endregion
+
+            #region Install Terminal Shields
+            //Station name
+            oSQLServer.OInstallTermShldQueries.Station = cSVfile[(int)CSV_MachConfig.InstallTermShldStationName];
+            //Station ID
+            oSQLServer.OInstallTermShldQueries.StationID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallTermShldStationID]);
+            //Equipment ID
+            oSQLServer.OInstallTermShldQueries.EquipmentID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallTermShldEquipmentID]);
+            //Limits table
+            oSQLServer.OInstallTermShldQueries.TblLimits = cSVfile[(int)CSV_MachConfig.LimitsOperParams];
+            //Heating Results History
+            oSQLServer.OInstallTermShldQueries.TblResultsHistory = cSVfile[(int)CSV_MachConfig.InstallTermShldHistory];
+            //Press Inner Can Master Parts Sequence View
+            oSQLServer.TblMastersPartsSeqView = cSVfile[(int)CSV_MachConfig.MasterSequenceView];
+            //Master Samples Quantity
+            oSQLServer.OInstallTermShldLimits.MasterSampleQty = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallTermShldMasterSamples]);
+            #endregion
+
+            #region Install M8 Inserts
+            //Station name
+            oSQLServer.OInstallM8InsrQueries.Station = cSVfile[(int)CSV_MachConfig.InstallM8InsrStationName];
+            //Station ID
+            oSQLServer.OInstallM8InsrQueries.StationID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallM8InsrStationID]);
+            //Equipment ID
+            oSQLServer.OInstallM8InsrQueries.EquipmentID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallM8InsrEquipmentID]);
+            //Limits table
+            oSQLServer.OInstallM8InsrQueries.TblLimits = cSVfile[(int)CSV_MachConfig.LimitsOperParams];
+            //Press Inner Can Results History
+            oSQLServer.OInstallM8InsrQueries.TblResultsHistory = cSVfile[(int)CSV_MachConfig.InstallM8InsrResultsHistory];
+            //Press Inner Can Master Parts Sequence View
+            oSQLServer.TblMastersPartsSeqView = cSVfile[(int)CSV_MachConfig.MasterSequenceView];
+            //Master Samples Quantity
+            oSQLServer.OInstallM8InsrLimits.MasterSampleQty = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.InstallM8InsrMasterSamples]);
+            #endregion
+
+            #region Plunger & Armature Assy
+            //Station name
+            oSQLServer.OPlugrArmAssyQueries.Station = cSVfile[(int)CSV_MachConfig.PlugrArmAssyStationName];
+            //Station ID
+            oSQLServer.OPlugrArmAssyQueries.StationID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.PlugrArmAssyStationID]);
+            //Equipment ID
+            oSQLServer.OPlugrArmAssyQueries.EquipmentID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.PlugrArmAssyEquipmentID]);
+            //Limits table
+            oSQLServer.OPlugrArmAssyQueries.TblLimits = cSVfile[(int)CSV_MachConfig.LimitsOperParams];
+            //Gross Leak Test Results History
+            oSQLServer.OPlugrArmAssyQueries.TblResultsHistory = cSVfile[(int)CSV_MachConfig.PlugrArmAssyResultsHistory];
+            //Gross Leak Test Master Parts Sequence View
+            oSQLServer.TblMastersPartsSeqView = cSVfile[(int)CSV_MachConfig.MasterSequenceView];
+            //Master Samples Quantity
+            oSQLServer.OPlugrArmAssyLimits.MasterSampleQty = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.PlugrArmAssyMasterSamples]);
+            #endregion
+
+            #region Latch Assy
+            //Station name
+            oSQLServer.OLatchAssyQueries.Station = cSVfile[(int)CSV_MachConfig.LatchAssyStationName];
+            //Station ID
+            oSQLServer.OLatchAssyQueries.StationID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.LatchAssyStationID]);
+            //Equipment ID
+            oSQLServer.OLatchAssyQueries.EquipmentID = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.LatchAssyEquipmentID]);
+            //Limits table
+            oSQLServer.OLatchAssyQueries.TblLimits = cSVfile[(int)CSV_MachConfig.LimitsOperParams];
+            //Gross Leak Test Results History
+            oSQLServer.OLatchAssyQueries.TblResultsHistory = cSVfile[(int)CSV_MachConfig.LatchAssyResultsHistory];
+            //Gross Leak Test Master Parts Sequence View
+            oSQLServer.TblMastersPartsSeqView = cSVfile[(int)CSV_MachConfig.MasterSequenceView];
+            //Master Samples Quantity
+            oSQLServer.OLatchAssyLimits.MasterSampleQty = Convert.ToInt32(cSVfile[(int)CSV_MachConfig.LatchAssyMasterSamples]);
+            #endregion
+
+            #endregion
+
+            InitDatabaseTables();
+            FillOutDatabaseTables();
+
+            getDevieIDsTask = Task.Run(new Action(() => { GetDeviceIDs();}));
+
+            #region Results
+            //Install Terminal Shields
+            ResultsInstallTermShld();
+            //Insta M8 Inserts
+            ResultsInstallNutIns();
+            //Plunger & Armature Assy
+            ResultsPlugrArmAssy();
+            //Latch Assy
+            ResultsLatchAssys();
+            #endregion
+
+            #region Prior Op Check
+            //Install Terminal Shields
+            PriorOPInstallTermShld();
+            //Insta M8 Inserts
+            PriorOPInstallNutIns();
+            //Plunger & Armature Assy
+            PriorOPPlugrArmAssy();
+            //Latch Assy
+            PriorOPLatchAssy();
+            #endregion
 
         }
 
         #region Private fields
 
+        MarkInfo markInfo;
+
+        #region Product info
+        private string deviceID;
+        public string DeviceID
+        {
+            set { deviceID = value; }
+            get { return deviceID; }
+        }
+        private string lotID;
+        public string LotID
+        {
+            set { lotID = value; }
+            get { return lotID; }
+        }
+        private int qty;
+        public int Qty
+        {
+            set { qty = value; }
+            get { return qty; }
+        }
+        #endregion
+
+        #region Database connection
+
+        private SQLDatabase oSQLServer;
+        private bool newLotSucc;
+        //Common
+        DataTable oDBtableCommon = new DataTable();
+        //Component Traceability
+        DataTable oDBtableScanComp = new DataTable();
+        DataTable oTblComponentTraceability = new DataTable();
+        //Install Terminal Shields
+        DataTable oDBtableInstallTermShld = new DataTable();
+        DataTable oLimitsTblInstallTermShld = new DataTable();
+        //Install M8 Inserts
+        DataTable oDBtableInstallNutInsr = new DataTable();
+        DataTable oLimitsTblInstallNutInsr = new DataTable();
+        //Plunger & Armature Assy
+        DataTable oDBtablePlungrArmAssy = new DataTable();
+        DataTable oLimitsTblPlungrArmAssy = new DataTable();
+        //Latch Assy
+        DataTable oDBtableLatchAssy = new DataTable();
+        DataTable oLimitsTblLatchAssy = new DataTable();
+
+        #endregion
+
+        #region CSV File machine settings
+        public string pathProdData = "MachineData/MachineConfig.csv";
+        //Machine config file 1 - 51
+        private const int maxCSVfields = 51;
+        private static string[] cSVfile = new string[maxCSVfields];
+        public string[] CSVfile { get { return cSVfile; } set { cSVfile = value; } }
+        #endregion
+
+        static string[] mastersSeqMsg = new string[5];
+        public string[] MastersSeqMsg
+        {
+            get
+            {
+                return mastersSeqMsg;
+            }
+
+            set
+            {
+                mastersSeqMsg = value;
+            }
+        }
+        string[] MasterTargetSerial = { "00000", "00000", "00000" };
+
+        #region Results
+        //Install Terminal Shields
+        public DataTable oTblResultsInstallTermShld = new DataTable();
+        //Install M8 Inserts
+        public DataTable oTblResultsInstallNutInsr = new DataTable();
+        //Plunger & Armature Assy
+        public DataTable oTblResultsPlungrArmAssy = new DataTable();
+        //Latch Assy
+        public DataTable oTblResultsLatchAssy = new DataTable();
+        #endregion
+
+        #region Prior Op Check
+        //Install Terminal Shields
+        public DataTable oTblPriorOPInstallTermShld = new DataTable();
+        //Install M8 Inserts
+        public DataTable oTblPriorOPInstallNutInsr = new DataTable();
+        //Plunger & Armature Assy
+        public DataTable oTblPriorOPPlungrArmAssy = new DataTable();
+        //Latch Assy
+        public DataTable oTblPriorOPLatchAssy = new DataTable();
+        #endregion
+
         #region Opc UA fields
         private OpcUaClient opcUaClient;
         private ReadValueIdCollection nodesToRead;
-        private DataValueCollection resultsValues;
+        public DataValueCollection resultsValues;
         private DataValueCollection tempResultValues;
         private bool autoAccept = false;
         private static bool sessionConnected = false;
@@ -91,19 +428,23 @@ namespace GigavacFuseApp
         private object opcLock = new object();
 
         private WriteValueCollection boolToWrite = new WriteValueCollection();
+        private WriteValueCollection stringToWrite = new WriteValueCollection();
+        private WriteValueCollection realToWrite = new WriteValueCollection();
         #endregion
 
         #region Tasks control
         private Task getTimeTask;
-        private CancellationTokenSource cancellGetDateTask;
+        private CancellationTokenSource cancelGetDateTask;
         private CancellationToken _ctGetDateTask;
 
+        private Task getDevieIDsTask;
+
         private Task opcUaGetStatusTask;
-        private CancellationTokenSource cancellGetStatusTask;
+        private CancellationTokenSource cancelGetStatusTask;
         private CancellationToken _ctGetStatusTask;
 
         private Task opcUaGetVarsTask;
-        private CancellationTokenSource cancellGetVarsTask;
+        private CancellationTokenSource cancelGetVarsTask;
         private CancellationToken _ctGetVarsTask;
 
         private Task OpcUaMonitor;
@@ -126,6 +467,7 @@ namespace GigavacFuseApp
         #endregion
 
         #region Async methods
+
         private void GetDate(CancellationToken _ct)
         {
             while (!_ct.IsCancellationRequested)
@@ -137,6 +479,33 @@ namespace GigavacFuseApp
                 } catch (Exception) { }
             }
             return;
+        }
+        private void GetDeviceIDs()
+        {
+            if(oSQLServer != null)
+            {
+                if (oSQLServer.DeviceIDs(oSQLServer.DeviceFamily))
+                {
+                    stpDBMsg.Dispatcher.Invoke(() => 
+                    {
+                        stpDBMsg.Children.Add(new TextBlock() 
+                        {
+                            Text = ($"{DateTime.Now}-----Device IDs ready."), 
+                            Foreground = Brushes.Black 
+                        });
+                    });
+                }
+                else
+                {
+                    stpDBMsg.Dispatcher.Invoke(() => {
+                        stpDBMsg.Children.Add(new TextBlock()
+                        {
+                            Text = ($"{DateTime.UtcNow}-----Device IDs can not be read."),
+                            Foreground = Brushes.DarkRed
+                        });
+                    });
+                }
+            }
         }
         private async Task InitOpcUa()
         {
@@ -270,10 +639,19 @@ namespace GigavacFuseApp
 
             }
         }
-        private void VarOpcUaMonitor(CancellationToken token)
+        private async void VarOpcUaMonitor(CancellationToken token)
         {
+            bool oneShot0 = false;
+            bool oneShot1 = false;
+            bool oneShot2 = false;
+            bool oneShot3 = false;
+            bool oneShot4 = false;
+            bool oneShot5 = false;
+            bool oneShot6 = false;
+            bool oneShot7 = false;
+
             try
-            {
+            {   
                 while (!token.IsCancellationRequested)
                 {
                     if (sessionConnected && resultsValues != null && resultsValues.Count > 0)
@@ -281,9 +659,9 @@ namespace GigavacFuseApp
                         dspDeviceID.Dispatcher.Invoke(() => { dspDeviceID.Text = (string)resultsValues[0].Value; });
                         dspLotID.Dispatcher.Invoke(() => { dspLotID.Text = (string)resultsValues[1].Value; });
                         dspQty.Dispatcher.Invoke(() => { dspQty.Text = (string)resultsValues[2].Value; });
-                        dspSelectedDvcID.Dispatcher.Invoke(() => { dspDeviceID.Text = (string)resultsValues[3].Value; });
-                        dspSelectedLotID.Dispatcher.Invoke(() => { dspLotID.Text = (string)resultsValues[4].Value; });
-                        dspSelectedQty.Dispatcher.Invoke(() => { dspQty.Text = (string)resultsValues[5].Value; });
+                        dspSelectedDvcID.Dispatcher.Invoke(() => { dspSelectedDvcID.Text = (string)resultsValues[3].Value; });
+                        dspSelectedLotID.Dispatcher.Invoke(() => { dspSelectedLotID.Text = (string)resultsValues[4].Value; });
+                        dspSelectedQty.Dispatcher.Invoke(() => { dspSelectedQty.Text = (string)resultsValues[5].Value; });
 
                         #region lamps
 
@@ -318,24 +696,12 @@ namespace GigavacFuseApp
                         }
 
                         //lmpStoper1In
-                        if ((bool)resultsValues[9].Value == true)
-                        {
-                            lmpStopr1Opn.Dispatcher.Invoke(() => { lmpStopr1Opn.Fill = brushGreen; });
-                        }
-                        else
-                        {
-                            lmpStopr1Opn.Dispatcher.Invoke(() => { lmpStopr1Opn.Fill = brushGray; });
-                        }
+                        if ((bool)resultsValues[9].Value == true){lmpStopr1Opn.Dispatcher.Invoke(() => { lmpStopr1Opn.Fill = brushGreen; });}
+                        else{lmpStopr1Opn.Dispatcher.Invoke(() => { lmpStopr1Opn.Fill = brushGray; });}
 
                         //lmpStoper2In
-                        if ((bool)resultsValues[10].Value == true)
-                        {
-                            lmpStopr2Opn.Dispatcher.Invoke(() => { lmpStopr2Opn.Fill = brushGreen; });
-                        }
-                        else
-                        {
-                            lmpStopr2Opn.Dispatcher.Invoke(() => { lmpStopr2Opn.Fill = brushGray; });
-                        }
+                        if ((bool)resultsValues[10].Value == true){lmpStopr2Opn.Dispatcher.Invoke(() => { lmpStopr2Opn.Fill = brushGreen; });}
+                        else{lmpStopr2Opn.Dispatcher.Invoke(() => { lmpStopr2Opn.Fill = brushGray; });}
 
                         //lmpHoldAOpn
                         if ((bool)resultsValues[11].Value == true)
@@ -508,14 +874,8 @@ namespace GigavacFuseApp
                         }
 
                         //lmpS2GrpCls
-                        if ((bool)resultsValues[28].Value == true)
-                        {
-                            lmpS2GrpCls.Dispatcher.Invoke(() => { lmpS2GrpCls.Fill = brushGreen; });
-                        }
-                        else
-                        {
-                            lmpS2GrpCls.Dispatcher.Invoke(() => { lmpS2GrpCls.Fill = brushGray; });
-                        }
+                        if ((bool)resultsValues[28].Value == true){lmpS2GrpCls.Dispatcher.Invoke(() => { lmpS2GrpCls.Fill = brushGreen; });}
+                        else{lmpS2GrpCls.Dispatcher.Invoke(() => { lmpS2GrpCls.Fill = brushGray; });}
 
                         //lmpS2GrpOpn
                         if ((bool)resultsValues[29].Value == true)
@@ -1830,13 +2190,248 @@ namespace GigavacFuseApp
 
                         #endregion
 
+                        #region Shield insert
+
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            //Get serial numbers
+                            dspShldSerialNo.Text = resultsValues[166].Value.ToString();
+                            dspShldOldSerial.Text = resultsValues[167].Value.ToString();
+                            //Get process result
+                            oTblResultsInstallTermShld.Rows[(int)eInstallTermShld_Prod_Results.PartStatus][1] = resultsValues[228].Value.ToString();
+
+                            dspShldDistance1.Text = resultsValues[160].Value.ToString();
+                            oTblResultsInstallTermShld.Rows[(int)eInstallTermShld_Prod_Results.ThresholdX_Min][1] = resultsValues[160].Value.ToString();
+
+                            dspShldDistance2.Text = resultsValues[161].Value.ToString();
+                            oTblResultsInstallTermShld.Rows[(int)eInstallTermShld_Prod_Results.ThresholdY_Min][1] = resultsValues[161].Value.ToString();
+
+                            dspShldForce1.Text = resultsValues[162].Value.ToString();
+                            oTblResultsInstallTermShld.Rows[(int)eInstallTermShld_Prod_Results.ThresholdX_Max][1] = resultsValues[162].Value.ToString();
+
+                            dspShldForce2.Text = resultsValues[163].Value.ToString();
+                            oTblResultsInstallTermShld.Rows[(int)eInstallTermShld_Prod_Results.ThresholdY_Max][1] = resultsValues[163].Value.ToString();
+                            //Get production information
+                            dspShldTotPc.Text = resultsValues[190].Value.ToString();
+                            barShldTotOkPc.Maximum = (Int16)resultsValues[190].Value;
+                            barShldTotNgPc.Maximum = (Int16)resultsValues[190].Value;
+                            
+                            dspShldTotOkPc.Text = resultsValues[191].Value.ToString();
+                            barShldTotOkPc.Value = (Int16)resultsValues[191].Value;
+
+                            dspShldTotNgPc.Text = resultsValues[192].Value.ToString();
+                            barShldTotNgPc.Value = (Int16)resultsValues[192].Value;
+
+                            dspShldLTotOkPc.Text = resultsValues[193].Value.ToString();
+                            barShldLTotOk.Value = (Int16)resultsValues[193].Value;
+
+                            dspShldLTotNgPc.Text = resultsValues[194].Value.ToString();
+                            barShldLTotNg.Value = (Int16)resultsValues[194].Value;
+
+                            dspShldRTotOkPc.Text = resultsValues[195].Value.ToString();
+                            barShldRTotOk.Value = (Int16)resultsValues[195].Value;
+
+                            dspShldRTotNgPc.Text = resultsValues[196].Value.ToString();
+                            barShldRTotNg.Value = (Int16)resultsValues[196].Value;
+
+                            if (resultsValues[164].Value.ToString() == "GOOD")
+                            {
+                                dspShldJdg1.Text = resultsValues[164].Value.ToString();
+                                dspShldJdg1.Foreground = Brushes.DarkGreen;
+                            }
+                            else if (resultsValues[164].Value.ToString() == "NOT GOOD")
+                            {
+                                dspShldJdg1.Text = resultsValues[164].Value.ToString();
+                                dspShldJdg1.Foreground = Brushes.DarkRed;
+                            }
+                            else
+                            {
+                                dspShldJdg1.Text = resultsValues[164].Value.ToString();
+                                dspShldJdg1.Foreground = Brushes.Black;
+                            }
+
+                            if (resultsValues[165].Value.ToString() == "GOOD")
+                            {
+                                dspShldJdg2.Text = resultsValues[165].Value.ToString();
+                                dspShldJdg2.Foreground = Brushes.DarkGreen;
+                            }
+                            else if (resultsValues[165].Value.ToString() == "NOT GOOD")
+                            {
+                                dspShldJdg2.Text = resultsValues[165].Value.ToString();
+                                dspShldJdg2.Foreground = Brushes.DarkRed;
+                            }
+                            else
+                            {
+                                dspShldJdg2.Text = resultsValues[165].Value.ToString();
+                                dspShldJdg2.Foreground = Brushes.Black;
+                            }
+                        });
+
+                        //Check operation
+                        if ((bool)resultsValues[197].Value && !oneShot0)
+                            await Task.Run(() => { ShieldCheckOp(); });
+                        oneShot0 = (bool)resultsValues[197].Value;
+                        //Update results
+                        if ((bool)resultsValues[198].Value && !oneShot1)
+                            await Task.Run(() => { ShieldUpdateCommand(); });
+                        oneShot1 = (bool)resultsValues[198].Value;
+
+                        #endregion
+
+                        #region Nut insert
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            //Get serial numbers
+                            dspNutLSerialNo.Text = resultsValues[176].Value.ToString();
+                            dspNutLOldSerial.Text = resultsValues[177].Value.ToString();
+                            dspNutRSerialNo.Text = resultsValues[178].Value.ToString();
+                            dspNutROldSerial.Text = resultsValues[179].Value.ToString();
+                            //Get process result
+                            oTblResultsInstallNutInsr.Rows[(int)eInstallM8Insr_Prod_Results.PartStatus][1] = resultsValues[229].Value.ToString();
+
+                            oTblResultsInstallNutInsr.Rows[(int)eInstallM8Insr_Prod_Results.Force_Left][1] = resultsValues[206].Value.ToString();
+                            dspNutLForce.Text = resultsValues[206].Value.ToString();
+
+                            oTblResultsInstallNutInsr.Rows[(int)eInstallM8Insr_Prod_Results.Distance_Left][1] = resultsValues[205].Value.ToString();
+                            dspNutLDistance.Text = resultsValues[205].Value.ToString();
+
+                            oTblResultsInstallNutInsr.Rows[(int)eInstallM8Insr_Prod_Results.Force_Right][1] = resultsValues[212].Value.ToString();
+                            dspNutRForce.Text = resultsValues[212].Value.ToString();
+
+                            oTblResultsInstallNutInsr.Rows[(int)eInstallM8Insr_Prod_Results.Distance_Right][1] = resultsValues[211].Value.ToString();
+                            dspNutRDistance.Text = resultsValues[211].Value.ToString();
+
+                            //Get production information
+                            dspNutLTotPc.Text = resultsValues[208].Value.ToString();
+                            barNutLTotOk.Maximum = (Int16)resultsValues[208].Value;
+                            barNutLTotNg.Maximum = (Int16)resultsValues[208].Value;
+                            
+                            dspNutRTotPc.Text = resultsValues[214].Value.ToString();
+                            barNutRTotOk.Maximum = (Int16)resultsValues[214].Value;
+                            barNutRTotNg.Maximum = (Int16)resultsValues[214].Value;
+
+                            dspNutLTotOk.Text = resultsValues[209].Value.ToString();
+                            dspNutLTotNg.Text = resultsValues[210].Value.ToString();
+
+                            dspNutRTotOk.Text = resultsValues[215].Value.ToString();
+                            dspNutRTotNg.Text = resultsValues[216].Value.ToString();
+
+                            if (resultsValues[207].Value.ToString() == "GOOD")
+                            {
+                                dspNutLJdg.Text = resultsValues[207].Value.ToString();
+                                dspNutLJdg.Foreground = Brushes.DarkGreen;
+                            }
+                            else if (resultsValues[207].Value.ToString() == "NOT GOOD")
+                            {
+                                dspNutLJdg.Text = resultsValues[207].Value.ToString();
+                                dspNutLJdg.Foreground = Brushes.DarkRed;
+                            }
+                            else
+                            {
+                                dspNutLJdg.Text = resultsValues[207].Value.ToString();
+                                dspNutLJdg.Foreground = Brushes.Black;
+                            }
+
+                            if (resultsValues[213].Value.ToString() == "GOOD")
+                            {
+                                dspNutRJdg.Text = resultsValues[213].Value.ToString();
+                                dspNutRJdg.Foreground = Brushes.DarkGreen;
+                            }
+                            else if (resultsValues[213].Value.ToString() == "NOT GOOD")
+                            {
+                                dspNutRJdg.Text = resultsValues[213].Value.ToString();
+                                dspNutRJdg.Foreground = Brushes.DarkRed;
+                            }
+                            else
+                            {
+                                dspNutRJdg.Text = resultsValues[213].Value.ToString();
+                                dspNutRJdg.Foreground = Brushes.Black;
+                            }
+                        });
+
+                        //Check operation
+                        if ((bool)resultsValues[199].Value && !oneShot2)
+                            await Task.Run(() => { NutCheckOp(); });
+                        oneShot2 = (bool)resultsValues[199].Value;
+                        //Update results
+                        if ((bool)resultsValues[200].Value && !oneShot3)
+                            await Task.Run(() => { NutUpdateCommand(); });
+                        oneShot3 = (bool)resultsValues[200].Value;
+
+                        #endregion
+
+                        #region Plunger & armature
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            //Get serial numbers
+                            dspPlngArmSerialNo.Text = resultsValues[180].Value.ToString();
+                            dspPlngArmOldSerial.Text = resultsValues[181].Value.ToString();
+                        });
+                        //Get process result
+                        oTblResultsPlungrArmAssy.Rows[(int)ePlugrArmAssy_Prod_Results.PartStatus][1] = resultsValues[224].Value.ToString();
+                        oTblResultsPlungrArmAssy.Rows[(int)ePlugrArmAssy_Prod_Results.Torque][1] = resultsValues[217].Value.ToString();
+                        oTblResultsPlungrArmAssy.Rows[(int)ePlugrArmAssy_Prod_Results.Angle][1] = resultsValues[218].Value.ToString();
+                        oTblResultsPlungrArmAssy.Rows[(int)ePlugrArmAssy_Prod_Results.Test1_Force][1] = resultsValues[219].Value.ToString();
+                        oTblResultsPlungrArmAssy.Rows[(int)ePlugrArmAssy_Prod_Results.Test2_Force][1] = resultsValues[220].Value.ToString();
+                        oTblResultsPlungrArmAssy.Rows[(int)ePlugrArmAssy_Prod_Results.Test1_Displacement][1] = resultsValues[221].Value.ToString();
+                        oTblResultsPlungrArmAssy.Rows[(int)ePlugrArmAssy_Prod_Results.Test2_Displacement][1] = resultsValues[222].Value.ToString();
+                        oTblResultsPlungrArmAssy.Rows[(int)ePlugrArmAssy_Prod_Results.ConstK][1] = resultsValues[223].Value.ToString();
+
+                        //Check operation
+                        if ((bool)resultsValues[201].Value && !oneShot4)
+                            await Task.Run(() => { PlngArmCheckOp(); });
+                        oneShot4 = (bool)resultsValues[201].Value;
+                        //Update results
+                        if ((bool)resultsValues[202].Value && !oneShot5)
+                            await Task.Run(() => { PlngArmUpdateCommand(); });
+                        oneShot5 = (bool)resultsValues[202].Value;
+
+                        #endregion
+
+                        #region Latch assy
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            //Get serial numbers
+                            dspLatchSerialNo.Text = resultsValues[182].Value.ToString();
+                            dspLatchOldSerial.Text = resultsValues[183].Value.ToString();
+                        });
+                        //Get process result
+                        oTblResultsLatchAssy.Rows[(int)eLatchAssy_Prod_Results.PartStatus][1] = resultsValues[225].Value.ToString();
+                        oTblResultsLatchAssy.Rows[(int)eLatchAssy_Prod_Results.Torque][1] = resultsValues[226].Value.ToString();
+                        oTblResultsLatchAssy.Rows[(int)eLatchAssy_Prod_Results.Angle][1] = resultsValues[227].Value.ToString();
+
+                        //Check operation
+                        if ((bool)resultsValues[203].Value && !oneShot6)
+                            await Task.Run(() => { LatchCheckOp(); });
+                        oneShot6 = (bool)resultsValues[203].Value;
+                        //Update results
+                        if ((bool)resultsValues[204].Value && !oneShot7)
+                            await Task.Run(() => { LatchUpdateCommand(); });
+                        oneShot7 = (bool)resultsValues[204].Value;
+
+                        #endregion
+
+                        #region Prepare
+                        if ((bool)resultsValues[171].Value) { lmpDeviceID.Dispatcher.Invoke(() => { lmpDeviceID.Fill = brushGreen; }); }
+                        else { lmpDeviceID.Dispatcher.Invoke(() => { lmpDeviceID.Fill = brushGray; }); }
+
+                        if ((bool)resultsValues[172].Value) { lmpLotID.Dispatcher.Invoke(() => { lmpLotID.Fill = brushGreen; }); }
+                        else { lmpLotID.Dispatcher.Invoke(() => { lmpLotID.Fill = brushGray; }); }
+
+                        if ((bool)resultsValues[173].Value) { lmpQty.Dispatcher.Invoke(() => { lmpQty.Fill = brushGreen; }); }
+                        else { lmpQty.Dispatcher.Invoke(() => { lmpQty.Fill = brushGray; }); }
+                        #endregion
+
                         Thread.Sleep(50);
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                stpOpcUaLog.Children.Add(new TextBlock() { Text = ($"{DateTime.UtcNow}-----Variables reading error"), Foreground = Brushes.DarkRed });
+                stpOpcUaLog.Dispatcher.Invoke(() =>
+                {
+                    stpOpcUaLog.Children.Add(new TextBlock() { Text = ($"{DateTime.Now}-----Variables reading error: {e}"), Foreground = Brushes.DarkRed });
+                });
                 MessageBox.Show("Error de lectura de variables");
                 DisconnectionRequest();
             }
@@ -2100,10 +2695,81 @@ namespace GigavacFuseApp
                         new ReadValueId() {NodeId = "ns=4;s=lmpLatchHome",          AttributeId = Attributes.Value},/*157*/
                         new ReadValueId() {NodeId = "ns=4;s=lmpBoltHome",           AttributeId = Attributes.Value},/*158*/
                         new ReadValueId() {NodeId = "ns=4;s=lmpPosCorrectHome",     AttributeId = Attributes.Value},/*159*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldDistance1",      AttributeId = Attributes.Value},/*160*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldDistance2",      AttributeId = Attributes.Value},/*161*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldForce1",         AttributeId = Attributes.Value},/*162*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldForce2",         AttributeId = Attributes.Value},/*163*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldJdg1",           AttributeId = Attributes.Value},/*164*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldJdg2",           AttributeId = Attributes.Value},/*165*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldSerialNo",       AttributeId = Attributes.Value},/*166*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldOldSerial",      AttributeId = Attributes.Value},/*167*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspMrkData",            AttributeId = Attributes.Value},/*168*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspReadData",           AttributeId = Attributes.Value},/*169*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspMrkOldData",         AttributeId = Attributes.Value},/*170*/
+                        new ReadValueId() {NodeId = "ns=4;s=lmpDvcIDSlctd",         AttributeId = Attributes.Value},/*171*/
+                        new ReadValueId() {NodeId = "ns=4;s=lmpLotIDSlctd",         AttributeId = Attributes.Value},/*172*/
+                        new ReadValueId() {NodeId = "ns=4;s=lmpQtySlctd",           AttributeId = Attributes.Value},/*173*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldSerialNo",       AttributeId = Attributes.Value},/*174*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldOldSerial",      AttributeId = Attributes.Value},/*175*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutLSerialNo",       AttributeId = Attributes.Value},/*176*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutLOldSerial",      AttributeId = Attributes.Value},/*177*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutRSerialNo",       AttributeId = Attributes.Value},/*178*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutROldSerial",      AttributeId = Attributes.Value},/*179*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspPlngArmSerialNo",    AttributeId = Attributes.Value},/*180*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspPlngArmOldSerial",   AttributeId = Attributes.Value},/*181*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspLatchSerialNo",      AttributeId = Attributes.Value},/*182*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspLatchOldSerial",     AttributeId = Attributes.Value},/*183*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldDistance1",      AttributeId = Attributes.Value},/*184*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldDistance2",      AttributeId = Attributes.Value},/*185*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldForce1",         AttributeId = Attributes.Value},/*186*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldForce2",         AttributeId = Attributes.Value},/*187*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldJdg1",           AttributeId = Attributes.Value},/*188*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldJdg2",           AttributeId = Attributes.Value},/*189*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldTotPc",          AttributeId = Attributes.Value},/*190*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldTotOkPc",        AttributeId = Attributes.Value},/*191*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldTotNgPc",        AttributeId = Attributes.Value},/*192*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldLTotOkPc",       AttributeId = Attributes.Value},/*193*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldLTotNgPc",       AttributeId = Attributes.Value},/*194*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldRTotOkPc",       AttributeId = Attributes.Value},/*195*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspShldRTotNgPc",       AttributeId = Attributes.Value},/*196*/
+                        new ReadValueId() {NodeId = "ns=4;s=shldChckOp",            AttributeId = Attributes.Value},/*197*/
+                        new ReadValueId() {NodeId = "ns=4;s=shldUpdtCmd",           AttributeId = Attributes.Value},/*198*/
+                        new ReadValueId() {NodeId = "ns=4;s=nutChckOp",             AttributeId = Attributes.Value},/*199*/
+                        new ReadValueId() {NodeId = "ns=4;s=nutUpdtCmd",            AttributeId = Attributes.Value},/*200*/
+                        new ReadValueId() {NodeId = "ns=4;s=plngArmChckOp",         AttributeId = Attributes.Value},/*201*/
+                        new ReadValueId() {NodeId = "ns=4;s=plngArmUpdtCmd",        AttributeId = Attributes.Value},/*202*/
+                        new ReadValueId() {NodeId = "ns=4;s=latchChckOp",           AttributeId = Attributes.Value},/*203*/
+                        new ReadValueId() {NodeId = "ns=4;s=latchUpdtCmd",          AttributeId = Attributes.Value},/*204*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutDistance1",       AttributeId = Attributes.Value},/*205*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutForce1",          AttributeId = Attributes.Value},/*206*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutJdg1",            AttributeId = Attributes.Value},/*207*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutLTotPc",          AttributeId = Attributes.Value},/*208*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutLTotOk",          AttributeId = Attributes.Value},/*209*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutLTotNg",          AttributeId = Attributes.Value},/*210*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutDistance2",       AttributeId = Attributes.Value},/*211*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutForce2",          AttributeId = Attributes.Value},/*212*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutJdg2",            AttributeId = Attributes.Value},/*213*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutRTotPc",          AttributeId = Attributes.Value},/*214*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutRTotOk",          AttributeId = Attributes.Value},/*215*/
+                        new ReadValueId() {NodeId = "ns=4;s=dspNutRTotNg",          AttributeId = Attributes.Value},/*216*/
+                        new ReadValueId() {NodeId = "ns=4;s=plngArmTorqueRslt",     AttributeId = Attributes.Value},/*217*/
+                        new ReadValueId() {NodeId = "ns=4;s=plngArmAngleRslt",      AttributeId = Attributes.Value},/*218*/
+                        new ReadValueId() {NodeId = "ns=4;s=plngArmForce1Rslt",     AttributeId = Attributes.Value},/*219*/
+                        new ReadValueId() {NodeId = "ns=4;s=plngArmForce2Rslt",     AttributeId = Attributes.Value},/*220*/
+                        new ReadValueId() {NodeId = "ns=4;s=plngArmDistance1Rslt",  AttributeId = Attributes.Value},/*221*/
+                        new ReadValueId() {NodeId = "ns=4;s=plngArmDistance2Rslt",  AttributeId = Attributes.Value},/*222*/
+                        new ReadValueId() {NodeId = "ns=4;s=plngArmConstKRslt",     AttributeId = Attributes.Value},/*223*/
+                        new ReadValueId() {NodeId = "ns=4;s=plngArmPartRslt",       AttributeId = Attributes.Value},/*224*/
+                        new ReadValueId() {NodeId = "ns=4;s=latchPartRslt",         AttributeId = Attributes.Value},/*225*/
+                        new ReadValueId() {NodeId = "ns=4;s=latchTorqueRslt",       AttributeId = Attributes.Value},/*226*/
+                        new ReadValueId() {NodeId = "ns=4;s=latchAngleRslt",        AttributeId = Attributes.Value},/*227*/
+                        new ReadValueId() {NodeId = "ns=4;s=shldJudge",             AttributeId = Attributes.Value},/*228*/
+                        new ReadValueId() {NodeId = "ns=4;s=nutJudge",              AttributeId = Attributes.Value},/*229*/
+
                     };
                 opcUaGetVarsTask = new Task(new Action(() => { VarOpcUaMonitor(_ctGetVarsTask); }));
-                cancellGetVarsTask = new CancellationTokenSource();
-                _ctGetVarsTask = cancellGetVarsTask.Token;
+                cancelGetVarsTask = new CancellationTokenSource();
+                _ctGetVarsTask = cancelGetVarsTask.Token;
                 while (!token.IsCancellationRequested)
                 {
                     try
@@ -2122,7 +2788,6 @@ namespace GigavacFuseApp
                         {
                             opcUaGetVarsTask.Start();
                         }
-                        //VarOpcUaMonitor(_ctGetVarsTask);
 
                         Thread.Sleep(50);
                     } catch (Exception) { }
@@ -2159,6 +2824,135 @@ namespace GigavacFuseApp
                 MessageBox.Show("Error de escritura: " + ex.Message);
             }
         }
+        private void OpcUaStringWriter(string nodeId, string text)
+        {
+            try
+            {
+                lock (opcLock)
+                {
+                    stringToWrite.Clear();
+                    WriteValue stringValue = new WriteValue();
+                    stringValue.NodeId = new NodeId(nodeId);
+                    stringValue.AttributeId = Attributes.Value;
+                    stringValue.Value = new DataValue(true);
+                    stringValue.Value.Value = text;
+                    stringToWrite.Add(stringValue);
+                    StatusCodeCollection results = null;
+                    opcUaClient.Session.Write(null, stringToWrite, out results, out DiagnosticInfoCollection diagnosticInfos);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error de escritura: " + ex.Message);
+            }
+        }
+        private bool OpcUaLimitsWriter()
+        {
+            bool correctOp;
+            float[] limits = new float[34];
+            string[] nodeId = new string[34];
+
+            #region collection
+            nodeId[0] = "ns=4;s=shldMaxDistance";
+            correctOp = float.TryParse(oSQLServer.OInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MaxDistance], out limits[0]);
+            nodeId[1] = "ns=4;s=shldMinDistance";
+            correctOp &= float.TryParse(oSQLServer.OInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MinDistance], out limits[1]);
+            nodeId[2] = "ns=4;s=shldMaxForce";
+            correctOp &= float.TryParse(oSQLServer.OInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MaxForce], out limits[2]);
+            nodeId[3] = "ns=4;s=shldMinForce";
+            correctOp &= float.TryParse(oSQLServer.OInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MinForce], out limits[3]);
+            nodeId[4] = "ns=4;s=nutMaxDistance";
+            correctOp &= float.TryParse(oSQLServer.OInstallM8InsrLimits.Limits[(int)eInstallM8Insr_Prod_Limits.ThresholdX_Max], out limits[4]);
+            nodeId[5] = "ns=4;s=nutMinDistance";
+            correctOp &= float.TryParse(oSQLServer.OInstallM8InsrLimits.Limits[(int)eInstallM8Insr_Prod_Limits.ThresholdX_Min], out limits[5]);
+            nodeId[6] = "ns=4;s=nutMaxForce";
+            correctOp &= float.TryParse(oSQLServer.OInstallM8InsrLimits.Limits[(int)eInstallM8Insr_Prod_Limits.ThresholdY_Max], out limits[6]);
+            nodeId[7] = "ns=4;s=nutMinForce";
+            correctOp &= float.TryParse(oSQLServer.OInstallM8InsrLimits.Limits[(int)eInstallM8Insr_Prod_Limits.ThresholdY_Min], out limits[7]);
+            nodeId[8] = "ns=4;s=plngMaxAngle";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Angle_Max], out limits[8]);
+            nodeId[9] = "ns=4;s=plngMinAngle";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Angle_Min], out limits[9]);
+            nodeId[10] = "ns=4;s=plngMaxTorque";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Torque_Max], out limits[10]);
+            nodeId[11] = "ns=4;s=plngMinTorque";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Torque_Min], out limits[11]);
+            nodeId[12] = "ns=4;s=plngMaxConstK";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ConstantK_max], out limits[12]);
+            nodeId[13] = "ns=4;s=plngMinConstK";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ConstantK_max], out limits[13]);
+            nodeId[14] = "ns=4;s=plngMaxTest1Distance";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1ChXmax], out limits[14]);
+            nodeId[15] = "ns=4;s=plngMinTest1Distance";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1ChXmin], out limits[15]);
+            nodeId[16] = "ns=4;s=plngMaxTest2Distance";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2ChXmax], out limits[16]);
+            nodeId[17] = "ns=4;s=plngMinTest2Distance";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2ChXmin], out limits[17]);
+            nodeId[18] = "ns=4;s=plngMaxTest1Force";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1ChYmax], out limits[18]);
+            nodeId[19] = "ns=4;s=plngMinTest1Force";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1ChYmin], out limits[19]);
+            nodeId[20] = "ns=4;s=plngMaxTest2Force";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2ChYmax], out limits[20]);
+            nodeId[21] = "ns=4;s=plngMinTest2Force";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2ChYmin], out limits[21]);
+            nodeId[22] = "ns=4;s=plngTest1Speed";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1Speed], out limits[22]);
+            nodeId[23] = "ns=4;s=plngTest1Position";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1Pos], out limits[23]);
+            nodeId[24] = "ns=4;s=plngTest2Speed";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2Speed], out limits[24]);
+            nodeId[25] = "ns=4;s=plngTest2Position";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2Pos], out limits[25]);
+            nodeId[26] = "ns=4;s=plngReadyPosition";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ReadyPos], out limits[26]);
+            nodeId[27] = "ns=4;s=plngReadySpeed";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ReadySpeed], out limits[27]);
+            nodeId[28] = "ns=4;s=plngInspection1";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.SpringInspection], out limits[28]);
+            nodeId[29] = "ns=4;s=plngInspection2";
+            correctOp &= float.TryParse(oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ArmatureInspection], out limits[29]);
+            nodeId[30] = "ns=4;s=latchMaxAngle";
+            correctOp &= float.TryParse(oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.Angle_Max], out limits[30]);
+            nodeId[31] = "ns=4;s=latchMinAngle";
+            correctOp &= float.TryParse(oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.Angle_Min], out limits[31]);
+            nodeId[32] = "ns=4;s=latchMaxTorque";
+            correctOp &= float.TryParse(oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.Torque_Max], out limits[32]);
+            nodeId[33] = "ns=4;s=latchMinTorque";
+            correctOp &= float.TryParse(oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.Torque_Min], out limits[33]);
+            #endregion
+
+            if (correctOp)
+            {
+                try
+                {
+                    lock (opcLock)
+                    {
+                        realToWrite.Clear();
+                        WriteValue realValue = new WriteValue();
+                        for (int j = 0; j < 34; j++)
+                        {
+                            realValue.NodeId = new NodeId(nodeId[j]);
+                            realValue.AttributeId = Attributes.Value;
+                            realValue.Value = new DataValue(true);
+                            realValue.Value.Value = limits[j];
+                            realToWrite.Add(realValue);
+                        }
+                        StatusCodeCollection results = null;
+                        opcUaClient.Session.Write(null, realToWrite, out results, out DiagnosticInfoCollection diagnosticInfos);
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error de escritura: " + ex.Message);
+                    return false;
+                }
+            }
+            else return false;
+
+        }
         private async void ConnectionRequest()
         {
             if (sessionConnected)
@@ -2189,13 +2983,1301 @@ namespace GigavacFuseApp
         {
             DisconnectionRequest();
             if (getTimeTask != null)
-            { cancellGetDateTask.Cancel();}
+            { cancelGetDateTask.Cancel();}
 
             if (opcUaGetStatusTask != null)
-            { cancellGetStatusTask.Cancel();}
+            { cancelGetStatusTask.Cancel();}
 
             if (opcUaGetVarsTask != null)
-            { cancellGetVarsTask.Cancel();}
+            { cancelGetVarsTask.Cancel();}
+
+        }
+        public void ReadMachineConfigFile()
+        {
+            try
+            {
+                #region Machine config CSV file
+                //Open the Production Data file to query the Device ID loaded
+                String List;
+                int i = 0;
+                //Query the file Log
+                StreamReader _File = new StreamReader(pathProdData);
+                while ((List = _File.ReadLine()) != null)
+                {
+                    string[] Data = List.Split(',');
+                    //Configuration File
+                    cSVfile[i] = Data[1];
+                    i++;
+                }
+                _File.Close();
+                #endregion
+            }
+            catch (Exception a)
+            {
+                //Message
+                //SystemMessages("Error to read the Machine Config CSV file\n", "Error");
+                Console.WriteLine(a);
+            }
+        }
+        void InitDatabaseTables()
+        {
+            #region Common queries for all stations
+            //Defines of the Columns of the Database Table
+            oDBtableCommon.Columns.Add("Name", typeof(string));
+            oDBtableCommon.Columns.Add("Path", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdCommonTbl.DataContext = oDBtableCommon;
+            #endregion
+
+            #region Component Traceability
+            //Defines of the Columns of the Database Table
+            oDBtableScanComp.Columns.Add("Name", typeof(string));
+            oDBtableScanComp.Columns.Add("Path", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            //tbl_DBtables_ScanComp.DataSource = ODBtable_ScanComp;
+            #endregion
+
+            #region Install Terminal Shields
+            //Defines of the Columns of the Database Table
+            oDBtableInstallTermShld.Columns.Add("Name", typeof(string));
+            oDBtableInstallTermShld.Columns.Add("Path", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdShldTbl.DataContext = oDBtableInstallTermShld;
+            //Defines of the Columns of the Limits Table
+            oLimitsTblInstallTermShld.Columns.Add("Limits", typeof(string));
+            oLimitsTblInstallTermShld.Columns.Add("Value", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdShldLimits.DataContext = oLimitsTblInstallTermShld;
+            #endregion
+
+            #region Install Nut Inserts
+            //Defines of the Columns of the Database Table
+            oDBtableInstallNutInsr.Columns.Add("Name", typeof(string));
+            oDBtableInstallNutInsr.Columns.Add("Path", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdNutTbl.DataContext = oDBtableInstallNutInsr;
+            //Defines of the Columns of the Limits Table
+            oLimitsTblInstallNutInsr.Columns.Add("Limits", typeof(string));
+            oLimitsTblInstallNutInsr.Columns.Add("Value", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdNutLimits.DataContext = oLimitsTblInstallNutInsr;
+            #endregion
+
+            #region Plunger & Armature Assy
+            //Defines of the Columns of the Database Table
+            oDBtablePlungrArmAssy.Columns.Add("Name", typeof(string));
+            oDBtablePlungrArmAssy.Columns.Add("Path", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdPlngrTbl.DataContext = oDBtablePlungrArmAssy;
+            //Defines of the Columns of the Limits Table
+            oLimitsTblPlungrArmAssy.Columns.Add("Limits", typeof(string));
+            oLimitsTblPlungrArmAssy.Columns.Add("Value", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdPlngrLimits.DataContext = oLimitsTblPlungrArmAssy;
+            #endregion
+
+            #region Latch Assy
+            //Defines of the Columns of the Database Table
+            oDBtableLatchAssy.Columns.Add("Name", typeof(string));
+            oDBtableLatchAssy.Columns.Add("Path", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdLatchTbl.DataContext = oDBtableLatchAssy;
+            //Defines of the Columns of the Limits Table
+            oLimitsTblLatchAssy.Columns.Add("Limits", typeof(string));
+            oLimitsTblLatchAssy.Columns.Add("Value", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdLatchLimits.DataContext = oLimitsTblLatchAssy;
+            #endregion
+
+        }
+        void FillOutDatabaseTables()
+        {
+            #region Common queries for all stations
+            oDBtableCommon.Rows.Clear();
+            oDBtableCommon.Rows.Add("Check Components", oSQLServer.TblCheckComponents);
+            oDBtableCommon.Rows.Add("Prior Op Check", oSQLServer.TblPriorOpCheck);
+            oDBtableCommon.Rows.Add("Assign Components", oSQLServer.TblAssignComponentsToSerial);
+            oDBtableCommon.Rows.Add("Update Device Status", oSQLServer.TblUpdateDeviceStatus);
+            oDBtableCommon.Rows.Add("Device IDs", oSQLServer.TblDeviceIDs);
+            #endregion
+
+            #region Component Traceability
+            //ODBtable_ScanComp.Rows.Add("Station Name", OSQLServer.OScanCompQueries.Station);
+            //ODBtable_ScanComp.Rows.Add("Station ID", OSQLServer.OScanCompQueries.StationID);
+            //ODBtable_ScanComp.Rows.Add("Equipment ID", OSQLServer.OScanCompQueries.EquipmentID);
+            //ODBtable_ScanComp.Rows.Add("Scan Component", OSQLServer.TblScanComponents);
+            //ODBtable_ScanComp.Rows.Add("Required Component", OSQLServer.TblRequiredComponents);
+            #endregion
+
+            #region Install Terminal Shields
+            //Database
+            oDBtableInstallTermShld.Rows.Clear();
+            oDBtableInstallTermShld.Rows.Add("Station Name", oSQLServer.OInstallTermShldQueries.Station);
+            oDBtableInstallTermShld.Rows.Add("Station ID", oSQLServer.OInstallTermShldQueries.StationID);
+            oDBtableInstallTermShld.Rows.Add("Equipment ID", oSQLServer.OInstallTermShldQueries.EquipmentID);
+            oDBtableInstallTermShld.Rows.Add("Limits", oSQLServer.OInstallTermShldQueries.TblLimits);
+            oDBtableInstallTermShld.Rows.Add("Store Results", oSQLServer.OInstallTermShldQueries.TblResultsHistory);
+            #endregion
+
+            #region Install Nut Inserts
+            //Database
+            oDBtableInstallNutInsr.Rows.Clear();
+            oDBtableInstallNutInsr.Rows.Add("Station Name", oSQLServer.OInstallM8InsrQueries.Station);
+            oDBtableInstallNutInsr.Rows.Add("Station ID", oSQLServer.OInstallM8InsrQueries.StationID);
+            oDBtableInstallNutInsr.Rows.Add("Equipment ID", oSQLServer.OInstallM8InsrQueries.EquipmentID);
+            oDBtableInstallNutInsr.Rows.Add("Limits", oSQLServer.OInstallM8InsrQueries.TblLimits);
+            oDBtableInstallNutInsr.Rows.Add("Store Results", oSQLServer.OInstallM8InsrQueries.TblResultsHistory);
+            #endregion
+
+            #region Plunger & Armature Assy
+            //Database
+            oDBtablePlungrArmAssy.Rows.Clear();
+            oDBtablePlungrArmAssy.Rows.Add("Station Name", oSQLServer.OPlugrArmAssyQueries.Station);
+            oDBtablePlungrArmAssy.Rows.Add("Station ID", oSQLServer.OPlugrArmAssyQueries.StationID);
+            oDBtablePlungrArmAssy.Rows.Add("Equipment ID", oSQLServer.OPlugrArmAssyQueries.EquipmentID);
+            oDBtablePlungrArmAssy.Rows.Add("Limits", oSQLServer.OPlugrArmAssyQueries.TblLimits);
+            oDBtablePlungrArmAssy.Rows.Add("Store Results", oSQLServer.OPlugrArmAssyQueries.TblResultsHistory);
+            #endregion
+
+            #region Latch Assy
+            //Database
+            oDBtableLatchAssy.Rows.Clear();
+            oDBtableLatchAssy.Rows.Add("Station Name", oSQLServer.OLatchAssyQueries.Station);
+            oDBtableLatchAssy.Rows.Add("Station ID", oSQLServer.OLatchAssyQueries.StationID);
+            oDBtableLatchAssy.Rows.Add("Equipment ID", oSQLServer.OLatchAssyQueries.EquipmentID);
+            oDBtableLatchAssy.Rows.Add("Limits", oSQLServer.OLatchAssyQueries.TblLimits);
+            oDBtableLatchAssy.Rows.Add("Store Results", oSQLServer.OLatchAssyQueries.TblResultsHistory);
+            #endregion
+        }
+        //Install Terminal Shields (Setting up)
+        public void ResultsInstallTermShld()
+        {
+            //Defines of the Columns of the Master parameters Table
+            oTblResultsInstallTermShld.Columns.Add("Result", typeof(string));
+            oTblResultsInstallTermShld.Columns.Add("Value", typeof(string));
+
+            oTblResultsInstallTermShld.Rows.Add("Part Status");
+            oTblResultsInstallTermShld.Rows.Add("Force Left");
+            oTblResultsInstallTermShld.Rows.Add("Displacement Left");
+            oTblResultsInstallTermShld.Rows.Add("Force Right");
+            oTblResultsInstallTermShld.Rows.Add("Displacement Right");
+
+            //Bind the Table to Data Grid Viewer
+            grdShldRslt.DataContext = oTblResultsInstallTermShld;
+        }
+        //Install Nut Inserts (Setting up)
+        public void ResultsInstallNutIns()
+        {
+            //Defines of the Columns of the Master parameters Table
+            oTblResultsInstallNutInsr.Columns.Add("Result", typeof(string));
+            oTblResultsInstallNutInsr.Columns.Add("Value", typeof(string));
+
+            oTblResultsInstallNutInsr.Rows.Add("Part Status");
+            oTblResultsInstallNutInsr.Rows.Add("Force Left");
+            oTblResultsInstallNutInsr.Rows.Add("Displacement Left");
+            oTblResultsInstallNutInsr.Rows.Add("Force Right");
+            oTblResultsInstallNutInsr.Rows.Add("Displacement Right");
+            //Bind the Table to Data Grid Viewer
+            grdNutRslt.DataContext = oTblResultsInstallNutInsr;
+        }
+        //Plunger & Armature Assy(Setting up)
+        public void ResultsPlugrArmAssy()
+        {
+            //Defines of the Columns of the Master parameters Table
+            oTblResultsPlungrArmAssy.Columns.Add("Result", typeof(string));
+            oTblResultsPlungrArmAssy.Columns.Add("Value", typeof(string));
+
+            oTblResultsPlungrArmAssy.Rows.Add("Part Status");
+            oTblResultsPlungrArmAssy.Rows.Add("Torque");
+            oTblResultsPlungrArmAssy.Rows.Add("Angle");
+            oTblResultsPlungrArmAssy.Rows.Add("Clamp");
+            oTblResultsPlungrArmAssy.Rows.Add("Seating Point");
+            oTblResultsPlungrArmAssy.Rows.Add("Clamp Angle");
+            oTblResultsPlungrArmAssy.Rows.Add("Test1 Force");
+            oTblResultsPlungrArmAssy.Rows.Add("Test1 Displacement");
+            oTblResultsPlungrArmAssy.Rows.Add("Test2 Force");
+            oTblResultsPlungrArmAssy.Rows.Add("Test2 Displacement");
+            oTblResultsPlungrArmAssy.Rows.Add("Constant K");
+            //Bind the Table to Data Grid Viewer
+            grdPlngrRslt.DataContext = oTblResultsPlungrArmAssy;
+        }
+        //Latch Assy (Setting up)
+        public void ResultsLatchAssys()
+        {
+            //Defines of the Columns of the Master parameters Table
+            oTblResultsLatchAssy.Columns.Add("Result", typeof(string));
+            oTblResultsLatchAssy.Columns.Add("Value", typeof(string));
+
+            oTblResultsLatchAssy.Rows.Add("Part Status");
+            oTblResultsLatchAssy.Rows.Add("Torque");
+            oTblResultsLatchAssy.Rows.Add("Angle");
+            oTblResultsLatchAssy.Rows.Add("Clamp");
+            oTblResultsLatchAssy.Rows.Add("Seating Point");
+            oTblResultsLatchAssy.Rows.Add("Clamp Angle");
+            //Bind the Table to Data Grid Viewer
+            grdLatchRslt.DataContext = oTblResultsLatchAssy;
+        }
+        //Install Terminal Shields (Add)
+        public void GetLimitsInstallTermShld()
+        {
+            //Database
+            oLimitsTblInstallTermShld.Rows.Clear();
+            oLimitsTblInstallTermShld.Rows.Add("Max Distance", oSQLServer.OInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MaxDistance]);
+            oLimitsTblInstallTermShld.Rows.Add("Min Distance", oSQLServer.OInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MinDistance]);
+            oLimitsTblInstallTermShld.Rows.Add("Max Force", oSQLServer.OInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MaxForce]);
+            oLimitsTblInstallTermShld.Rows.Add("Min Force", oSQLServer.OInstallTermShldLimits.Limits[(int)eInstallTermShld_Prod_Limits.MinForce]);
+        }
+        //Install M8 Inserts (Add)
+        public void GetLimitsInstallNutIns()
+        {
+            //Database
+            oLimitsTblInstallNutInsr.Rows.Clear();
+            oLimitsTblInstallNutInsr.Rows.Add("Displacement Max", oSQLServer.OInstallM8InsrLimits.Limits[(int)eInstallM8Insr_Prod_Limits.ThresholdX_Max]);
+            oLimitsTblInstallNutInsr.Rows.Add("Displacement Min", oSQLServer.OInstallM8InsrLimits.Limits[(int)eInstallM8Insr_Prod_Limits.ThresholdX_Min]);
+            oLimitsTblInstallNutInsr.Rows.Add("Force Max", oSQLServer.OInstallM8InsrLimits.Limits[(int)eInstallM8Insr_Prod_Limits.ThresholdY_Max]);
+            oLimitsTblInstallNutInsr.Rows.Add("Force Min", oSQLServer.OInstallM8InsrLimits.Limits[(int)eInstallM8Insr_Prod_Limits.ThresholdY_Min]);
+            oLimitsTblInstallNutInsr.Rows.Add("Vision Recipe", oSQLServer.OInstallM8InsrLimits.Limits[(int)eInstallM8Insr_Prod_Limits.VisionRecipe]);
+        }
+        //Plunger & Armature Assy (Add)
+        public void GetLimitsPlugrArmAssy()
+        {
+            //Database
+            oLimitsTblPlungrArmAssy.Rows.Clear();
+            oLimitsTblPlungrArmAssy.Rows.Add("Angle Max", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Angle_Max]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Angle Min", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Angle_Min]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Torque Max", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Torque_Max]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Torque Min", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Torque_Min]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Clamp Angle Max", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ClampAngle_Max]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Clamp Angle Min", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ClampAngle_Min]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Clamp Torque Max", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ClampTorque_Max]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Clamp Torque Min", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ClampTorque_Min]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Seating Point Max", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.SP_Max]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Seating Point Min", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.SP_Min]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Constant K Max", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ConstantK_max]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Constant K Min", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ConstantK_min]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test1 ChX Max", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1ChXmax]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test1 ChX Min", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1ChXmin]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test1 ChY Max", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1ChYmax]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test1 ChY Min", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1ChYmin]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test1 Position", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1Pos]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test1 Speed", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test1Speed]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test2 ChX Max", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2ChXmax]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test2 ChX Min", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2ChXmin]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test2 ChY Max", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2ChYmax]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test2 ChY Min", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2ChYmin]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test2 Position", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2Pos]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Test2 Speed", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.Test2Speed]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Standby Position", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.StandbyPos]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Standby Speed", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.StandbySpeed]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Ready Position", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ReadyPos]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Ready Speed", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ReadySpeed]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Screw Position", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ScrewdrivingPos]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Screw Speed", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ScrewdrivingSpeed]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Armature Inspection", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.ArmatureInspection]);
+            oLimitsTblPlungrArmAssy.Rows.Add("Spring Inspection", oSQLServer.OPlugrArmAssyLimits.Limits[(int)ePlugrArmAssy_Prod_Limits.SpringInspection]);
+        }
+        //Latch Assy (Add)
+        public void GetLimitsLatchAssys()
+        {
+            //Database
+            oLimitsTblLatchAssy.Rows.Clear();
+            oLimitsTblLatchAssy.Rows.Add("Angle Max", oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.Angle_Max]);
+            oLimitsTblLatchAssy.Rows.Add("Angle Min", oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.Angle_Min]);
+            oLimitsTblLatchAssy.Rows.Add("Torque Max", oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.Torque_Max]);
+            oLimitsTblLatchAssy.Rows.Add("Torque Min", oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.Torque_Min]);
+            oLimitsTblLatchAssy.Rows.Add("Clamp Angle Max", oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.ClampAngle_Max]);
+            oLimitsTblLatchAssy.Rows.Add("Clamp Angle Min", oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.ClampAngle_Min]);
+            oLimitsTblLatchAssy.Rows.Add("Clamp Torque Max", oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.ClampTorque_Max]);
+            oLimitsTblLatchAssy.Rows.Add("Clamp Torque Min", oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.ClampTorque_Min]);
+            oLimitsTblLatchAssy.Rows.Add("Seating Point Max", oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.SP_Max]);
+            oLimitsTblLatchAssy.Rows.Add("Seating Point Min", oSQLServer.OLatchAssyLimits.Limits[(int)eLatchAssy_Prod_Limits.SP_Min]);
+        }
+        //Install Terminal Shields (Setting up)
+        public void PriorOPInstallTermShld()
+        {
+            //Defines of the Columns of the Master parameters Table
+            oTblPriorOPInstallTermShld.Columns.Add("Parameter", typeof(string));
+            oTblPriorOPInstallTermShld.Columns.Add("Value", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdShldPriorOp.DataContext = oTblPriorOPInstallTermShld;
+        }
+        public void GetPriorOPInstallTermShld(string MessageText, string LastStation, string PartStatus)
+        {
+            //Database
+            oTblPriorOPInstallTermShld.Rows.Clear();
+            oTblPriorOPInstallTermShld.Rows.Add("Message text", MessageText);
+            oTblPriorOPInstallTermShld.Rows.Add("Last Station", LastStation);
+            oTblPriorOPInstallTermShld.Rows.Add("Part Status", PartStatus);
+        }
+        //Install Nut Inserts (Setting up)
+        public void PriorOPInstallNutIns()
+        {
+            //Defines of the Columns of the Master parameters Table
+            oTblPriorOPInstallNutInsr.Columns.Add("Parameter", typeof(string));
+            oTblPriorOPInstallNutInsr.Columns.Add("Value", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdNutPriorOp.DataContext = oTblPriorOPInstallNutInsr;
+        }
+        public void GetPriorOPInstallNutIns(string MessageText, string LastStation, string PartStatus)
+        {
+            //Database
+            oTblPriorOPInstallNutInsr.Rows.Clear();
+            oTblPriorOPInstallNutInsr.Rows.Add("Message text", MessageText);
+            oTblPriorOPInstallNutInsr.Rows.Add("Last Station", LastStation);
+            oTblPriorOPInstallNutInsr.Rows.Add("Part Status", PartStatus);
+        }
+        //Plunger & Armature Assy(Setting up)
+        public void PriorOPPlugrArmAssy()
+        {
+            //Defines of the Columns of the Master parameters Table
+            oTblPriorOPPlungrArmAssy.Columns.Add("Parameter", typeof(string));
+            oTblPriorOPPlungrArmAssy.Columns.Add("Value", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdPlngrPriorOp.DataContext = oTblPriorOPPlungrArmAssy;
+        }
+        public void GetPriorOPPlugrArmAssy(string MessageText, string LastStation, string PartStatus)
+        {
+            //Database
+            oTblPriorOPPlungrArmAssy.Rows.Clear();
+            oTblPriorOPPlungrArmAssy.Rows.Add("Message text", MessageText);
+            oTblPriorOPPlungrArmAssy.Rows.Add("Last Station", LastStation);
+            oTblPriorOPPlungrArmAssy.Rows.Add("Part Status", PartStatus);
+        }
+        //Latch Assy (Setting up)
+        public void PriorOPLatchAssy()
+        {
+            //Defines of the Columns of the Master parameters Table
+            oTblPriorOPLatchAssy.Columns.Add("Parameter", typeof(string));
+            oTblPriorOPLatchAssy.Columns.Add("Value", typeof(string));
+            //Bind the Table to Data Grid Viewer
+            grdLatchPriorOp.DataContext = oTblPriorOPLatchAssy;
+        }
+        public void GetPriorOPLatchAssy(string MessageText, string LastStation, string PartStatus)
+        {
+            //Database
+            oTblPriorOPLatchAssy.Rows.Clear();
+            oTblPriorOPLatchAssy.Rows.Add("Message text", MessageText);
+            oTblPriorOPLatchAssy.Rows.Add("Last Station", LastStation);
+            oTblPriorOPLatchAssy.Rows.Add("Part Status", PartStatus);
+        }
+        private async Task<bool> NewLot()
+        {
+            bool done = false;
+            bool correctQty = false;
+
+            deviceID = "";
+            dspDeviceID.Dispatcher.Invoke(() => { deviceID = dspDeviceID.Text; });
+            lotID = "";
+            dspLotID.Dispatcher.Invoke(() => { lotID = dspLotID.Text; });
+            qty = 0;
+            correctQty = dspQty.Dispatcher.Invoke(bool () => { return Int32.TryParse(dspQty.Text, out qty); });
+
+            if (lotID == "" || lotID.Length > 20 ||
+                qty == 0 || deviceID == "") 
+            {
+                stpDBMsg.Dispatcher.Invoke(() => {
+                    stpDBMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Parámetros incorrectos."),
+                        Foreground = Brushes.DarkRed 
+                    });
+                });
+            }
+            else
+            {
+                stpDBMsg.Dispatcher.Invoke(() => {
+                    stpDBMsg.Children.Clear();
+                    stpDBMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Obteniendo límites..."),
+                        Foreground = Brushes.Black
+                    });
+                });
+
+                if (oSQLServer.InstallTermShldLimitsDB(deviceID)) 
+                {
+                    done = true;
+                    GetLimitsInstallTermShld();
+                }
+                else
+                    stpDBMsg.Dispatcher.Invoke(() =>
+                    {
+                        stpDBMsg.Children.Add(new TextBlock()
+                        {
+                            Text = ($"{DateTime.Now}-----Error al obtener límites de terminal shield."),
+                            Foreground = Brushes.DarkRed
+                        });
+                    });
+
+                if (done) done &= oSQLServer.InstallM8InsrLimitsDB(deviceID);
+                if (done) GetLimitsInstallNutIns();
+                else
+                    stpDBMsg.Dispatcher.Invoke(() =>
+                    {
+                        stpDBMsg.Children.Add(new TextBlock()
+                        {
+                            Text = ($"{DateTime.Now}-----Error al obtener límites de inserción de nut."),
+                            Foreground = Brushes.DarkRed
+                        });
+                    });
+
+                if (done) done &= oSQLServer.PlugrArmAssyLimitsDB(deviceID);
+                if (done) GetLimitsPlugrArmAssy();
+                else
+                    stpDBMsg.Dispatcher.Invoke(() =>
+                    {
+                        stpDBMsg.Children.Add(new TextBlock()
+                        {
+                            Text = ($"{DateTime.Now}-----Error al obtener límites plunger y armature."),
+                            Foreground = Brushes.DarkRed
+                        });
+                    });
+
+                if (done) done &= oSQLServer.LatchAssyLimitsDB(deviceID);
+                if (done) GetLimitsLatchAssys();
+                else
+                    stpDBMsg.Dispatcher.Invoke(() =>
+                    {
+                        stpDBMsg.Children.Add(new TextBlock()
+                        {
+                            Text = ($"{DateTime.Now}-----Error al obtener límites inserción de latch."),
+                            Foreground = Brushes.DarkRed
+                        });
+                    });
+                done = true;
+                if (done)
+                    done &= await Task.Run(OpcUaLimitsWriter);
+                else
+                    stpDBMsg.Dispatcher.Invoke(() =>
+                    {
+                        stpDBMsg.Children.Add(new TextBlock()
+                        {
+                            Text = ($"{DateTime.Now}-----Error de envío de límites a controlador."),
+                            Foreground = Brushes.DarkRed
+                        });
+                    });
+                if (done)
+                    stpDBMsg.Dispatcher.Invoke(() =>
+                    {
+                        stpDBMsg.Children.Add(new TextBlock()
+                        {
+                            Text = ($"{DateTime.Now}-----Lote {lotID} cargado correctamente."),
+                            Foreground = Brushes.Black
+                        });
+                    });
+
+            }
+            return done;
+        }
+        private async void ShieldCheckOp()
+        {
+            Int64 serialNumber = 0;
+            bool cnctDone = false;
+            bool correctSerial = false;
+
+            correctSerial = this.Dispatcher.Invoke(bool () => 
+            {
+                return Int64.TryParse(dspShldSerialNo.Text, out serialNumber);
+            });
+
+            if (!correctSerial)
+            {
+                stpShieldMsg.Children.Clear();
+                stpShieldMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----Número serial incorrecto"),
+                    Foreground = Brushes.DarkRed
+                });
+                return;
+            }
+
+            cnctDone = oSQLServer.CheckComponents(oSQLServer.OInstallTermShldQueries, deviceID);
+            if (cnctDone && oSQLServer.CheckComponents_Return == 0)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpShieldMsg.Children.Clear();
+                    dspShldChckComp.Text = oSQLServer.CheckComponents_Msg;
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.CheckComponents_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Revisión de componentes correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            }
+            else
+            {
+                stpShieldMsg.Children.Clear();
+                dspShldChckComp.Text = oSQLServer.CheckComponents_Msg;
+                stpShieldMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----{oSQLServer.CheckComponents_Msg}"),
+                    Foreground = Brushes.Black
+                });
+                stpShieldMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----Revisión de componentes incorrecta."),
+                    Foreground = Brushes.DarkRed
+                });
+            }
+
+            if (cnctDone) cnctDone &= oSQLServer.PriorOpCheck(oSQLServer.OInstallTermShldQueries, serialNumber, deviceID);
+
+            if (cnctDone && oSQLServer.PriorOpChk_Return == 0)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Prior Op correcto."),
+                        Foreground = Brushes.Black
+                    });
+                });
+                GetPriorOPInstallTermShld(oSQLServer.POChkMsg, oSQLServer.POChkMsg2, oSQLServer.POChkMsg3);
+            }
+            else
+            {
+                stpShieldMsg.Dispatcher.Invoke(() =>
+                {
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Prior Op incorrecto."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+            }
+            
+            if (cnctDone) { await Task.Run(() => { OpcUaStringWriter("ns=4;s=shldChckOpRslt", "GOOD"); }); }
+            else { await Task.Run(() => { OpcUaStringWriter("ns=4;s=shldChckOpRslt", "NOT GOOD"); }); }
+        }
+        private async void ShieldUpdateCommand()
+        {
+            bool cnctDone = false;
+            Int64 serialNumber = 0;
+            object[] value1 = new object[5];
+            object[] value2 = new object[5];
+
+            value1[(int)eInstallTermShld_Prod_Results.PartStatus] = oTblResultsInstallTermShld.Rows[(int)eInstallTermShld_Prod_Results.PartStatus][1];
+            for (int i = 0; i < 5; i++) 
+            {
+                value2[i] = oTblResultsInstallTermShld.Rows[i][1];
+            }
+
+            dspShldSerialNo.Dispatcher.Invoke(() => { serialNumber = Int64.Parse(dspShldSerialNo.Text); });
+            
+            cnctDone = oSQLServer.AssignComponentsToSerial(oSQLServer.OInstallTermShldQueries, serialNumber, deviceID, lotID);
+
+            if (cnctDone && oSQLServer.AssignComponentsToSerial_Return == 0)
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspShldAssingComp.Text = oSQLServer.AssignComponentsToSerial_Msg;
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.AssignComponentsToSerial_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Asignación de componentes a serial correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            else
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspShldAssingComp.Text = oSQLServer.AssignComponentsToSerial_Msg;
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.AssignComponentsToSerial_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Asignación de componentes a serial incorrecta."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+
+            if (cnctDone) 
+                cnctDone &= oSQLServer.UpdateDeviceStatus(oSQLServer.OInstallTermShldQueries, serialNumber, deviceID, value1[(int)eInstallTermShld_Prod_Results.PartStatus].ToString());
+            if (cnctDone && oSQLServer.UpdateDevice_Return == 0)
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspShldUpdtDvcSts.Text = oSQLServer.UpDevStatMsg;
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.UpDevStatMsg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Actualización de dispositivo correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            else
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspShldUpdtDvcSts.Text = oSQLServer.UpDevStatMsg;
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.UpDevStatMsg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Actualización de dispositivo incorrecta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+
+            if (cnctDone)
+            {
+                cnctDone &= oSQLServer.InstallTermShldResultsDB(serialNumber, deviceID, lotID,
+                     value2[(int)eInstallTermShld_Prod_Results.PartStatus].ToString(),
+                     value2[(int)eInstallTermShld_Prod_Results.ThresholdX_Max].ToString(),
+                     value2[(int)eInstallTermShld_Prod_Results.ThresholdX_Min].ToString(),
+                     value2[(int)eInstallTermShld_Prod_Results.ThresholdY_Max].ToString(),
+                     value2[(int)eInstallTermShld_Prod_Results.ThresholdY_Min].ToString());
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Resultados cargados correctamente."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            }
+            else
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpShieldMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Resultados cargados incorrectamente."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+
+            }
+
+            if (cnctDone) { await Task.Run(() => { OpcUaStringWriter("ns=4;s=shldUpdtRslt", "GOOD"); }); }
+            else { await Task.Run(() => { OpcUaStringWriter("ns=4;s=shldUpdtRslt", "NOT GOOD"); }); }
+
+        }
+        private async void NutCheckOp()
+        {
+            Int64 serialNumber = 0;
+            bool cnctDone = false;
+            bool correctSerial = false;
+
+            correctSerial = this.Dispatcher.Invoke(bool () =>
+            {
+                return Int64.TryParse(dspNutLSerialNo.Text, out serialNumber);
+            });
+
+            if (!correctSerial)
+            {
+                stpNutLMsg.Children.Clear();
+                stpNutLMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----Número serial incorrecto"),
+                    Foreground = Brushes.DarkRed
+                });
+                return;
+            }
+
+            cnctDone = oSQLServer.CheckComponents(oSQLServer.OInstallM8InsrQueries, deviceID);
+            if (cnctDone && oSQLServer.CheckComponents_Return == 0)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpNutLMsg.Children.Clear();
+                    dspNutChckComp.Text = oSQLServer.CheckComponents_Msg;
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.CheckComponents_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Revisión de componentes correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            }
+            else
+            {
+                stpNutLMsg.Children.Clear();
+                dspNutChckComp.Text = oSQLServer.CheckComponents_Msg;
+                stpNutLMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----{oSQLServer.CheckComponents_Msg}"),
+                    Foreground = Brushes.Black
+                });
+                stpNutLMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----Revisión de componentes incorrecta."),
+                    Foreground = Brushes.DarkRed
+                });
+            }
+
+            if (cnctDone) cnctDone &= oSQLServer.PriorOpCheck(oSQLServer.OInstallM8InsrQueries, serialNumber, deviceID);
+
+            if (cnctDone && oSQLServer.PriorOpChk_Return == 0)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Prior Op correcto."),
+                        Foreground = Brushes.Black
+                    });
+                });
+                GetPriorOPInstallNutIns(oSQLServer.POChkMsg, oSQLServer.POChkMsg2, oSQLServer.POChkMsg3);
+            }
+            else
+            {
+                stpNutLMsg.Dispatcher.Invoke(() =>
+                {
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Prior Op incorrecto."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+            }
+
+            if (cnctDone) { await Task.Run(() => { OpcUaStringWriter("ns=4;s=nutChckOpRslt", "GOOD"); }); }
+            else { await Task.Run(() => { OpcUaStringWriter("ns=4;s=nutChckOpRslt", "NOT GOOD"); }); }
+        }
+        private async void NutUpdateCommand()
+        {
+            bool cnctDone = false;
+            Int64 serialNumber = 0;
+            object[] value1 = new object[5];
+            object[] value2 = new object[5];
+
+            value1[(int)eInstallM8Insr_Prod_Results.PartStatus] = oTblResultsInstallNutInsr.Rows[(int)eInstallM8Insr_Prod_Results.PartStatus][1];
+            for (int i = 0; i < 5; i++)
+            {
+                value2[i] = oTblResultsInstallNutInsr.Rows[i][1];
+            }
+
+            dspNutLSerialNo.Dispatcher.Invoke(() => { serialNumber = Int64.Parse(dspNutLSerialNo.Text); });
+
+            cnctDone = oSQLServer.AssignComponentsToSerial(oSQLServer.OInstallM8InsrQueries, serialNumber, deviceID, lotID);
+
+            if (cnctDone && oSQLServer.AssignComponentsToSerial_Return == 0)
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspNutAssingComp.Text = oSQLServer.AssignComponentsToSerial_Msg;
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.AssignComponentsToSerial_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Asignación de componentes a serial correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            else
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspNutAssingComp.Text = oSQLServer.AssignComponentsToSerial_Msg;
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.AssignComponentsToSerial_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Asignación de componentes a serial incorrecta."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+
+            if (cnctDone)
+                cnctDone &= oSQLServer.UpdateDeviceStatus(oSQLServer.OInstallM8InsrQueries, serialNumber, deviceID, value1[(int)eInstallM8Insr_Prod_Results.PartStatus].ToString());
+            if (cnctDone && oSQLServer.UpdateDevice_Return == 0)
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspNutUpdtDvcSts.Text = oSQLServer.UpDevStatMsg;
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.UpDevStatMsg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Actualización de dispositivo correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            else
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspNutUpdtDvcSts.Text = oSQLServer.UpDevStatMsg;
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.UpDevStatMsg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Actualización de dispositivo incorrecta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+
+            if (cnctDone)
+            {
+                cnctDone &= oSQLServer.InstallM8InsrResultsDB(serialNumber, deviceID, lotID,
+                     value2[(int)eInstallM8Insr_Prod_Results.PartStatus].ToString(),
+                     value2[(int)eInstallM8Insr_Prod_Results.Force_Left].ToString(),
+                     value2[(int)eInstallM8Insr_Prod_Results.Distance_Left].ToString(),
+                     value2[(int)eInstallM8Insr_Prod_Results.Force_Right].ToString(),
+                     value2[(int)eInstallM8Insr_Prod_Results.Distance_Right].ToString());
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Resultados cargados correctamente."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            }
+            else
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpNutLMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Resultados cargados incorrectamente."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+
+            }
+
+            if (cnctDone) { await Task.Run(() => { OpcUaStringWriter("ns=4;s=nutUpdtRslt", "GOOD"); }); }
+            else { await Task.Run(() => { OpcUaStringWriter("ns=4;s=nutUpdtRslt", "NOT GOOD"); }); }
+
+        }
+        private async void PlngArmCheckOp()
+        {
+            Int64 serialNumber = 0;
+            bool cnctDone = false;
+            bool correctSerial = false;
+
+            correctSerial = this.Dispatcher.Invoke(bool () =>
+            {
+                return Int64.TryParse(dspPlngArmSerialNo.Text, out serialNumber);
+            });
+
+            if (!correctSerial)
+            {
+                stpPlngArmMsg.Children.Clear();
+                stpPlngArmMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----Número serial incorrecto"),
+                    Foreground = Brushes.DarkRed
+                });
+                return;
+            }
+
+            cnctDone = oSQLServer.CheckComponents(oSQLServer.OPlugrArmAssyQueries, deviceID);
+            if (cnctDone && oSQLServer.CheckComponents_Return == 0)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpPlngArmMsg.Children.Clear();
+                    dspPlngrChckComp.Text = oSQLServer.CheckComponents_Msg;
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.CheckComponents_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Revisión de componentes correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            }
+            else
+            {
+                stpPlngArmMsg.Children.Clear();
+                dspPlngrChckComp.Text = oSQLServer.CheckComponents_Msg;
+                stpPlngArmMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----{oSQLServer.CheckComponents_Msg}"),
+                    Foreground = Brushes.Black
+                });
+                stpPlngArmMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----Revisión de componentes incorrecta."),
+                    Foreground = Brushes.DarkRed
+                });
+            }
+
+            if (cnctDone) cnctDone &= oSQLServer.PriorOpCheck(oSQLServer.OPlugrArmAssyQueries, serialNumber, deviceID);
+
+            if (cnctDone && oSQLServer.PriorOpChk_Return == 0)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Prior Op correcto."),
+                        Foreground = Brushes.Black
+                    });
+                });
+                GetPriorOPPlugrArmAssy(oSQLServer.POChkMsg, oSQLServer.POChkMsg2, oSQLServer.POChkMsg3);
+            }
+            else
+            {
+                stpPlngArmMsg.Dispatcher.Invoke(() =>
+                {
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Prior Op incorrecto."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+            }
+
+            if (cnctDone) { await Task.Run(() => { OpcUaStringWriter("ns=4;s=nutChckOpRslt", "GOOD"); }); }
+            else { await Task.Run(() => { OpcUaStringWriter("ns=4;s=nutChckOpRslt", "NOT GOOD"); }); }
+        }
+        private async void PlngArmUpdateCommand()
+        {
+            bool cnctDone = false;
+            Int64 serialNumber = 0;
+            object[] value1 = new object[5];
+            object[] value2 = new object[11];
+
+            value1[(int)ePlugrArmAssy_Prod_Results.PartStatus] = oTblResultsPlungrArmAssy.Rows[(int)ePlugrArmAssy_Prod_Results.PartStatus][1];
+            for (int i = 0; i < 11; i++)
+            {
+                value2[i] = oTblResultsPlungrArmAssy.Rows[i][1];
+            }
+
+            dspPlngArmSerialNo.Dispatcher.Invoke(() => { serialNumber = Int64.Parse(dspPlngArmSerialNo.Text); });
+
+            cnctDone = oSQLServer.AssignComponentsToSerial(oSQLServer.OPlugrArmAssyQueries, serialNumber, deviceID, lotID);
+
+            if (cnctDone && oSQLServer.AssignComponentsToSerial_Return == 0)
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspPlngrAssingComp.Text = oSQLServer.AssignComponentsToSerial_Msg;
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.AssignComponentsToSerial_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Asignación de componentes a serial correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            else
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspPlngrAssingComp.Text = oSQLServer.AssignComponentsToSerial_Msg;
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.AssignComponentsToSerial_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Asignación de componentes a serial incorrecta."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+
+            if (cnctDone)
+                cnctDone &= oSQLServer.UpdateDeviceStatus(oSQLServer.OPlugrArmAssyQueries, serialNumber, deviceID, value1[(int)ePlugrArmAssy_Prod_Results.PartStatus].ToString());
+            if (cnctDone && oSQLServer.UpdateDevice_Return == 0)
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspPlngrUpdtDvcSts.Text = oSQLServer.UpDevStatMsg;
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.UpDevStatMsg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Actualización de dispositivo correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            else
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspPlngrUpdtDvcSts.Text = oSQLServer.UpDevStatMsg;
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.UpDevStatMsg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Actualización de dispositivo incorrecta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+
+            if (cnctDone)
+            {
+                cnctDone &= oSQLServer.PlugrArmAssyResultsDB(serialNumber, deviceID, lotID,
+                                 value2[(int)ePlugrArmAssy_Prod_Results.PartStatus].ToString(),
+                                 value2[(int)ePlugrArmAssy_Prod_Results.Torque].ToString(),
+                                 value2[(int)ePlugrArmAssy_Prod_Results.Angle].ToString(),
+                                 value2[(int)ePlugrArmAssy_Prod_Results.Clamp].ToString(),
+                                 value2[(int)ePlugrArmAssy_Prod_Results.SP].ToString(),
+                                 value2[(int)ePlugrArmAssy_Prod_Results.ClampAngle].ToString(),
+                                 value2[(int)ePlugrArmAssy_Prod_Results.Test1_Force].ToString(),
+                                 value2[(int)ePlugrArmAssy_Prod_Results.Test1_Displacement].ToString(),
+                                 value2[(int)ePlugrArmAssy_Prod_Results.Test2_Force].ToString(),
+                                 value2[(int)ePlugrArmAssy_Prod_Results.Test2_Displacement].ToString(),
+                                 value2[(int)ePlugrArmAssy_Prod_Results.ConstK].ToString());
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Resultados cargados correctamente."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            }
+            else
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpPlngArmMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Resultados cargados incorrectamente."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+
+            }
+
+            if (cnctDone) { await Task.Run(() => { OpcUaStringWriter("ns=4;s=plngArmUpdtRslt", "GOOD"); }); }
+            else { await Task.Run(() => { OpcUaStringWriter("ns=4;s=plngArmUpdtRslt", "NOT GOOD"); }); }
+
+        }
+        private async void LatchCheckOp()
+        {
+            Int64 serialNumber = 0;
+            bool cnctDone = false;
+            bool correctSerial = false;
+
+            correctSerial = this.Dispatcher.Invoke(bool () =>
+            {
+                return Int64.TryParse(dspLatchSerialNo.Text, out serialNumber);
+            });
+
+            if (!correctSerial)
+            {
+                stpLatchMsg.Children.Clear();
+                stpLatchMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----Número serial incorrecto"),
+                    Foreground = Brushes.DarkRed
+                });
+                return;
+            }
+
+            cnctDone = oSQLServer.CheckComponents(oSQLServer.OLatchAssyQueries, deviceID);
+            if (cnctDone && oSQLServer.CheckComponents_Return == 0)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpLatchMsg.Children.Clear();
+                    dspLatchChckComp.Text = oSQLServer.CheckComponents_Msg;
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.CheckComponents_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Revisión de componentes correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            }
+            else
+            {
+                stpLatchMsg.Children.Clear();
+                dspLatchChckComp.Text = oSQLServer.CheckComponents_Msg;
+                stpLatchMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----{oSQLServer.CheckComponents_Msg}"),
+                    Foreground = Brushes.Black
+                });
+                stpLatchMsg.Children.Add(new TextBlock()
+                {
+                    Text = ($"{DateTime.Now}-----Revisión de componentes incorrecta."),
+                    Foreground = Brushes.DarkRed
+                });
+            }
+
+            if (cnctDone) cnctDone &= oSQLServer.PriorOpCheck(oSQLServer.OLatchAssyQueries, serialNumber, deviceID);
+
+            if (cnctDone && oSQLServer.PriorOpChk_Return == 0)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Prior Op correcto."),
+                        Foreground = Brushes.Black
+                    });
+                });
+                GetPriorOPLatchAssy(oSQLServer.POChkMsg, oSQLServer.POChkMsg2, oSQLServer.POChkMsg3);
+            }
+            else
+            {
+                stpLatchMsg.Dispatcher.Invoke(() =>
+                {
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Prior Op incorrecto."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+            }
+
+            if (cnctDone) { await Task.Run(() => { OpcUaStringWriter("ns=4;s=latchChckOpRslt", "GOOD"); }); }
+            else { await Task.Run(() => { OpcUaStringWriter("ns=4;s=latchChckOpRslt", "NOT GOOD"); }); }
+        }
+        private async void LatchUpdateCommand()
+        {
+            bool cnctDone = false;
+            Int64 serialNumber = 0;
+            object[] value1 = new object[5];
+            object[] value2 = new object[6];
+
+            value1[(int)eLatchAssy_Prod_Results.PartStatus] = oTblResultsLatchAssy.Rows[(int)eLatchAssy_Prod_Results.PartStatus][1];
+            for (int i = 0; i < 11; i++)
+            {
+                value2[i] = oTblResultsLatchAssy.Rows[i][1];
+            }
+
+            dspLatchSerialNo.Dispatcher.Invoke(() => { serialNumber = Int64.Parse(dspLatchSerialNo.Text); });
+
+            cnctDone = oSQLServer.AssignComponentsToSerial(oSQLServer.OLatchAssyQueries, serialNumber, deviceID, lotID);
+
+            if (cnctDone && oSQLServer.AssignComponentsToSerial_Return == 0)
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspLatchAssingComp.Text = oSQLServer.AssignComponentsToSerial_Msg;
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.AssignComponentsToSerial_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Asignación de componentes a serial correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            else
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspLatchAssingComp.Text = oSQLServer.AssignComponentsToSerial_Msg;
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.AssignComponentsToSerial_Msg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Asignación de componentes a serial incorrecta."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+
+            if (cnctDone)
+                cnctDone &= oSQLServer.UpdateDeviceStatus(oSQLServer.OLatchAssyQueries, serialNumber, deviceID, value1[(int)eLatchAssy_Prod_Results.PartStatus].ToString());
+            if (cnctDone && oSQLServer.UpdateDevice_Return == 0)
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspLatchUpdtDvcSts.Text = oSQLServer.UpDevStatMsg;
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.UpDevStatMsg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Actualización de dispositivo correcta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            else
+                this.Dispatcher.Invoke(() =>
+                {
+                    dspLatchUpdtDvcSts.Text = oSQLServer.UpDevStatMsg;
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----{oSQLServer.UpDevStatMsg}"),
+                        Foreground = Brushes.Black
+                    });
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Actualización de dispositivo incorrecta."),
+                        Foreground = Brushes.Black
+                    });
+                });
+
+            if (cnctDone)
+            {
+                cnctDone &= oSQLServer.LatchAssyResultsDB(serialNumber, deviceID, lotID,
+                                 value2[(int)eLatchAssy_Prod_Results.PartStatus].ToString(),
+                                 value2[(int)eLatchAssy_Prod_Results.Torque].ToString(),
+                                 value2[(int)eLatchAssy_Prod_Results.Angle].ToString(),
+                                 value2[(int)eLatchAssy_Prod_Results.Clamp].ToString(),
+                                 value2[(int)eLatchAssy_Prod_Results.SP].ToString(),
+                                 value2[(int)eLatchAssy_Prod_Results.ClampAngle].ToString());
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Resultados cargados correctamente."),
+                        Foreground = Brushes.Black
+                    });
+                });
+            }
+            else
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    stpLatchMsg.Children.Add(new TextBlock()
+                    {
+                        Text = ($"{DateTime.Now}-----Resultados cargados incorrectamente."),
+                        Foreground = Brushes.DarkRed
+                    });
+                });
+
+            }
+
+            if (cnctDone) { await Task.Run(() => { OpcUaStringWriter("ns=4;s=latchUpdtRslt", "GOOD"); }); }
+            else { await Task.Run(() => { OpcUaStringWriter("ns=4;s=latchUpdtRslt", "NOT GOOD"); }); }
 
         }
 
@@ -2204,29 +4286,28 @@ namespace GigavacFuseApp
         private async void ClosingWindow(object sender, System.ComponentModel.CancelEventArgs e)
         {
             await Task.Run(() => { CloseProcess(); });
+            if(markInfo != null && markInfo.IsActive)
+            {
+                markInfo.Close();
+            }
             MessageBox.Show("Opc Ua disconnected.");
         }
-
         private void MnuConnectClick(object sender, RoutedEventArgs e)
         {
             ConnectionRequest();
         }
-
         private void MnuDisconnectClick(object sender, RoutedEventArgs e)
         {
             DisconnectionRequest();
         }
-
         private void BtnConnectClick(object sender, RoutedEventArgs e)
         {
             ConnectionRequest();
         }
-
         private void BtnDisconnectClick(object sender, RoutedEventArgs e)
         {
             DisconnectionRequest();
         }
-
         private void MnuExitClick(object sender, RoutedEventArgs e)
         {
             CloseProcess();
@@ -2245,7 +4326,6 @@ namespace GigavacFuseApp
                 MessageBox.Show("There is not OPC UA connection.", "Error OPC UA");
             }
         }
-
         private async void BtnTrans1HomeRelease(object sender, MouseButtonEventArgs e)
         {
             if (sessionConnected)
@@ -2257,7 +4337,6 @@ namespace GigavacFuseApp
                 MessageBox.Show("There is not OPC UA connection.", "Error OPC UA");
             }
         }
-
         private async void BtnRbt1HomePress(object sender, MouseButtonEventArgs e)
         {
             if (sessionConnected)
@@ -2269,7 +4348,6 @@ namespace GigavacFuseApp
                 MessageBox.Show("There is not OPC UA connection.", "Error OPC UA");
             }
         }
-
         private async void BtnRbt1HomeRelease(object sender, MouseButtonEventArgs e)
         {
             if (sessionConnected)
@@ -3687,6 +5765,133 @@ namespace GigavacFuseApp
         private void BtnS6EjectorUpRelease(object sender, MouseButtonEventArgs e)
         {
 
+        }
+
+        private void BtnShwMrkInfo(object sender, RoutedEventArgs e)
+        {
+            if(sessionConnected)
+            {
+                markInfo = new MarkInfo(this);
+                markInfo.Show();
+            }
+        }
+
+        private async void BtnDeviceIDPress(object sender, MouseButtonEventArgs e)
+        {
+            if (sessionConnected)
+            {
+                await Task.Run(() => { OpcUaBoolWriter("ns=4;s=btnDeviceID", true); });
+            }
+            else
+            {
+                MessageBox.Show("There is not OPC UA connection.", "Error OPC UA");
+            }
+        }
+
+        private async void BtnDeviceIDRelease(object sender, MouseButtonEventArgs e)
+        {
+            if (sessionConnected)
+            {
+                await Task.Run(() => { OpcUaBoolWriter("ns=4;s=btnDeviceID", false); });
+            }
+            else
+            {
+                MessageBox.Show("There is not OPC UA connection.", "Error OPC UA");
+            }
+        }
+
+        private async void BtnLotIDPress(object sender, MouseButtonEventArgs e)
+        {
+            if (sessionConnected)
+            {
+                await Task.Run(() => { OpcUaBoolWriter("ns=4;s=btnLotID", true); });
+            }
+            else
+            {
+                MessageBox.Show("There is not OPC UA connection.", "Error OPC UA");
+            }
+
+        }
+
+        private async void BtnLotIDRelease(object sender, MouseButtonEventArgs e)
+        {
+            if (sessionConnected)
+            {
+                await Task.Run(() => { OpcUaBoolWriter("ns=4;s=btnLotID", false); });
+            }
+            else
+            {
+                MessageBox.Show("There is not OPC UA connection.", "Error OPC UA");
+            }
+
+        }
+
+        private async void BtnQtyPress(object sender, MouseButtonEventArgs e)
+        {
+            if (sessionConnected)
+            {
+                await Task.Run(() => { OpcUaBoolWriter("ns=4;s=btnQty", true); });
+            }
+            else
+            {
+                MessageBox.Show("There is not OPC UA connection.", "Error OPC UA");
+            }
+        }
+
+        private async void BtnQtyRelease(object sender, MouseButtonEventArgs e)
+        {
+            if (sessionConnected)
+            {
+                await Task.Run(() => { OpcUaBoolWriter("ns=4;s=btnQty", false); });
+            }
+            else
+            {
+                MessageBox.Show("There is not OPC UA connection.", "Error OPC UA");
+            }
+        }
+
+        private async void BtnNewLot(object sender, RoutedEventArgs e)
+        {
+            if (sessionConnected)
+            {
+                btnNewLot.IsEnabled = false;
+                newLotSucc = await Task.Run(NewLot); 
+                if (newLotSucc)
+                {
+                    btnEndLot.IsEnabled = true;
+                    btnNewLot.IsEnabled = false;
+                    btnDeviceID.IsEnabled = false;
+                    btnLotID.IsEnabled = false;
+                    btnQty.IsEnabled = false;
+
+                    barShldTotPc.Maximum = int.Parse(dspQty.Text);
+                    barNutLTotPc.Maximum = int.Parse(dspQty.Text);
+                    barNutRTotPc.Maximum = int.Parse(dspQty.Text);
+
+
+                    await Task.Run(() => { OpcUaBoolWriter("ns=4;s=newLotReady", true); });
+
+                    //dspSelectedDvcID.Text = dspDeviceID.Text;
+                    //dspSelectedLotID.Text = dspSelectedLotID.Text;
+                    //dspSelectedQty.Text = dspQty.Text;
+                }
+                else
+                {
+                    btnEndLot.IsEnabled = false;
+                    btnNewLot.IsEnabled = true;
+                    btnDeviceID.IsEnabled = true;
+                    btnLotID.IsEnabled = true;
+                    btnQty.IsEnabled = true;
+
+                    await Task.Run(() => { OpcUaBoolWriter("ns=4;s=newLotReady", false); });
+
+                    dspSelectedDvcID.Text = "";
+                    dspSelectedLotID.Text = "";
+                    dspSelectedQty.Text = "";
+
+                }
+            }
+            else { MessageBox.Show("Error: No existe conexión OPC UA."); }
         }
     }
 }
